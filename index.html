@@ -561,7 +561,7 @@ function setupEditorClick(){
 }
 function addHotspot(x,y,pctX,pctY){
   const id=nextHotspotId++;
-  const hotspot={id,x,y,pctX,pctY,text:'Click here to learn more about this feature.'};
+  const hotspot={id,x,y,pctX,pctY,text:'',isNew:true};
   state.hotspots.push(hotspot);
   state.activeHotspot=id;
   renderHotspot(hotspot);
@@ -594,11 +594,11 @@ function openInlineEditor(id){
   if(fy+140>canvas.offsetHeight) fy=py-140;
   if(fy<0) fy=10;
   form.style.left=fx+'px'; form.style.top=fy+'px';
-  const defaultText='Click here to learn more about this feature.';
-  const isNew=h.text===defaultText;
-  const taValue=isNew?'':escapeHtml(h.text);
-  form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="saveHotspot('+id+')">Save</button></div>';
+  const taValue=h.isNew?'':escapeHtml(h.text);
+  form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
   canvas.appendChild(form);
+  // Stop clicks inside the form from bubbling to the canvas
+  form.onclick=function(e){e.stopPropagation();};
   document.getElementById('hs-text-'+id).focus();
 }
 function clearHotspotForms(){
@@ -606,7 +606,7 @@ function clearHotspotForms(){
 }
 function saveHotspot(id){
   const ta=document.getElementById('hs-text-'+id);
-  const h=state.hotspots.find(x=>x.id===id); if(h && ta){h.text=ta.value;}
+  const h=state.hotspots.find(x=>x.id===id); if(h && ta){h.text=ta.value; h.isNew=false;}
   clearHotspotForms(); renderSteps(); showToast('Step saved.'); autosave();
 }
 function deleteHotspot(id){
