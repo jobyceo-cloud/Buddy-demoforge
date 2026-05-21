@@ -544,6 +544,8 @@ function setupEditorClick(){
   overlay.onclick=null;
   canvas.onclick=null;
   const handler=function(e){
+    // Only add hotspot if clicking the canvas/overlay itself, not a child element (hotspot, form, button)
+    if(e.target!==canvas && e.target!==overlay) return;
     const rect=canvas.getBoundingClientRect();
     const x=e.clientX-rect.left;
     const y=e.clientY-rect.top;
@@ -592,7 +594,10 @@ function openInlineEditor(id){
   if(fy+140>canvas.offsetHeight) fy=py-140;
   if(fy<0) fy=10;
   form.style.left=fx+'px'; form.style.top=fy+'px';
-  form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+escapeHtml(h.text)+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="saveHotspot('+id+')">Save</button></div>';
+  const defaultText='Click here to learn more about this feature.';
+  const isNew=h.text===defaultText;
+  const taValue=isNew?'':escapeHtml(h.text);
+  form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="saveHotspot('+id+')">Save</button></div>';
   canvas.appendChild(form);
   document.getElementById('hs-text-'+id).focus();
 }
