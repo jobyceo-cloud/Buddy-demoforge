@@ -1,0 +1,34 @@
+# DemoForge — Project Conventions for AI Agents
+
+## Overview
+Turn any website or screenshot into an interactive guided sales demo. Single-page HTML/JS app + Python server. Serves on localhost:9000. Dark theme with cyan accent.
+
+## Sacred Files — NEVER modify without explicit permission
+- `index.html` — The entire frontend app. All UI logic and CSS live here.
+- `server.py` — Python HTTP backend. Demo storage, share links, proxy.
+- `data/` — Live demo JSON storage. Do not delete.
+
+## Test Commands
+```bash
+# Syntax check
+cd ~/Projects/demoforge && python3 -c "import server; print('server imports OK')"
+
+# Start server
+cd ~/Projects/demoforge && python3 server.py &
+sleep 2 && curl -s http://localhost:8766/api/demos
+curl -s -X POST http://localhost:8766/api/demos -H "Content-Type: application/json" -d '{"title":"Test Demo","source":{"type":"image","url":null,"imageData":"data:image/png;base64,test"},"hotspots":[{"pctX":0.5,"pctY":0.5,"text":"Hello world"}]}'
+kill %1 2>/dev/null
+```
+
+## Architecture
+- `index.html` — Single-page app (SPA). Dark UI, landing + capture + editor + player + share screens.
+- `server.py` — BaseHTTPRequestHandler backend. Port 8766. Stores demos as JSON, serves frontend, handles `/play/{id}` standalone viewer, POST `/api/demos` to save.
+- `data/` — JSON demo files persisted to disk.
+
+## Critical Patterns
+- Frontend is self-contained: vanilla JS, no build step, no framework.
+- Hotspots store percentage coordinates (pctX, pctY) so they scale with any viewport.
+- Share links can be server-stored (`/play/{id}`) or local hash-based (`#play=base64`).
+- QR codes are canvas-generated inline (no external libraries).
+- URL capture uses iframe sandbox for live sites; image upload works offline.
+- All text/markdown uses basic hyphens and ASCII dashes only — no em-dashes or curly quotes in source code or JSON.

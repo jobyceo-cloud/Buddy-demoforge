@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DemoForge — Turn Any Website Into a Guided Tour</title>
+<style>
+/* ============================================================
+   DemoForge — Global Reset & Design System
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+:root {
+  --bg:#0b0f19; --surface:#111827; --surface-2:#1a2332; --surface-3:#232d3f;
+  --text:#e5e7eb; --text-dim:#9ca3af; --text-faint:#6b7280;
+  --accent:#0ea5e9; --accent-2:#22d3ee; --accent-glow:#0ea5e944;
+  --success:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+  --ring:0 0 0 1px rgba(255,255,255,.06);
+  --shadow:0 10px 40px rgba(0,0,0,.35);
+  --radius:10px; --radius-lg:16px;
+}
+html { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+body { overflow-x:hidden; }
+button,input,textarea,select { font:inherit; color:inherit; border:none; outline:none; }
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(14,165,233,.5)} 70%{box-shadow:0 0 0 18px rgba(14,165,233,0)} 100%{box-shadow:0 0 0 0 rgba(14,165,233,0)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+/* ============================================================
+   Layout Shell
+   ============================================================ */
+.df-shell { display:none; width:100%; min-height:100vh; animation:fadeIn .35s ease; }
+.df-shell.active { display:flex; flex-direction:column; }
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:var(--surface); border-bottom:1px solid rgba(255,255,255,.06); position:sticky; top:0; z-index:100; }
+.brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
+.brand-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:#fff; }
+.brand-title { font-size:18px; font-weight:700; letter-spacing:-.3px; }
+.brand-sub { font-size:12px; color:var(--text-dim); font-weight:500; }
+.topbar-actions { display:flex; gap:10px; }
+
+.btn { padding:10px 18px; border-radius:var(--radius); background:var(--surface-2); color:var(--text); font-size:14px; font-weight:600; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.08); }
+.btn:hover { background:var(--surface-3); border-color:rgba(255,255,255,.14); }
+.btn-primary { background:var(--accent); color:#fff; border-color:transparent; }
+.btn-primary:hover { background:#0284c7; }
+.btn-ghost { background:transparent; border-color:rgba(255,255,255,.1); }
+.btn-sm { padding:6px 12px; font-size:12px; }
+.btn-lg { padding:14px 28px; font-size:16px; border-radius:var(--radius-lg); }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.input { padding:12px 16px; border-radius:var(--radius); background:var(--surface-2); border:1px solid rgba(255,255,255,.1); color:var(--text); font-size:15px; width:100%; transition:.15s; }
+.input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+
+/* ============================================================
+   LANDING SCREEN
+   ============================================================ */
+.landing-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 24px; text-align:center; }
+.landing-hero h1 { font-size:clamp(32px,5vw,60px); font-weight:800; line-height:1.05; letter-spacing:-1px; margin-bottom:16px; max-width:700px; }
+.landing-hero h1 span { background:linear-gradient(90deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.landing-hero p { font-size:clamp(16px,2vw,20px); color:var(--text-dim); max-width:560px; line-height:1.5; margin-bottom:36px; }
+.landing-cta { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+.hero-visual { width:100%; max-width:680px; margin:50px auto 0; height:360px; background:var(--surface); border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.08); position:relative; overflow:hidden; }
+.hero-visual .screen { width:100%; height:100%; background:linear-gradient(135deg,#0f172a 0%,#1a2332 50%,#0f172a 100%); position:relative; }
+.hero-visual .screen::after { content:""; position:absolute; top:20%; left:10%; width:80%; height:6px; background:rgba(255,255,255,.06); border-radius:3px; }
+.hero-visual .screen::before { content:""; position:absolute; top:35%; left:10%; width:60%; height:6px; background:rgba(255,255,255,.04); border-radius:3px; }
+.hero-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.play-btn { width:64px; height:64px; background:rgba(14,165,233,.9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff; cursor:pointer; animation:pulse 2.5s infinite; transition:.2s; }
+.play-btn:hover { transform:scale(1.1); }
+.landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:60px auto 0; }
+.feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; }
+.feature-icon { width:36px; height:36px; background:var(--surface-2); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:16px; }
+.feature-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; }
+.feature-card p { font-size:13px; color:var(--text-dim); line-height:1.45; }
+
+/* ============================================================
+   CAPTURE SCREEN
+   ============================================================ */
+.capture-body { display:flex; flex-direction:column; align-items:center; padding:60px 24px; flex:1; }
+.capture-card { background:var(--surface); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:36px; width:100%; max-width:560px; text-align:center; }
+.capture-card h2 { font-size:22px; margin-bottom:8px; }
+.capture-card p { color:var(--text-dim); font-size:15px; margin-bottom:28px; }
+.capture-input-group { display:flex; gap:10px; margin-bottom:16px; }
+.capture-input-group .input { flex:1; }
+.drop-zone { border:2px dashed rgba(255,255,255,.15); border-radius:var(--radius-lg); padding:36px; margin-top:16px; cursor:pointer; transition:.2s; }
+.drop-zone:hover, .drop-zone.dragover { border-color:var(--accent); background:rgba(14,165,233,.05); }
+.drop-zone p { color:var(--text-dim); font-size:14px; margin:0; }
+
+/* ============================================================
+   EDITOR SCREEN
+   ============================================================ */
+.editor-body { display:flex; flex:1; overflow:hidden; }
+.editor-stage { flex:1; position:relative; background:#000; display:flex; align-items:center; justify-content:center; overflow:auto; padding:24px; }
+.editor-canvas { position:relative; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.editor-canvas iframe, .editor-canvas img { display:block; border:none; max-width:100%; }
+.hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; cursor:pointer; animation:pulse 2s infinite; transform:translate(-50%,-50%); box-shadow:0 0 12px var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; }
+.hotspot.active { background:var(--warn); box-shadow:0 0 12px var(--warn); }
+.hotspot-editor-form { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:14px; width:280px; z-index:20; box-shadow:var(--shadow); }
+.hotspot-editor-form textarea { width:100%; min-height:70px; resize:vertical; background:var(--surface-3); border:1px solid rgba(255,255,255,.1); border-radius:6px; padding:8px; font-size:13px; color:var(--text); margin-bottom:10px; }
+.hotspot-editor-form .btn-row { display:flex; gap:8px; justify-content:flex-end; }
+
+.editor-sidebar { width:320px; background:var(--surface); border-left:1px solid rgba(255,255,255,.06); display:flex; flex-direction:column; }
+.editor-sidebar-header { padding:18px 20px; border-bottom:1px solid rgba(255,255,255,.06); }
+.editor-sidebar-header h3 { font-size:15px; margin-bottom:4px; }
+.editor-sidebar-header p { font-size:12px; color:var(--text-dim); }
+.steps-list { flex:1; overflow-y:auto; padding:12px; }
+.step-item { background:var(--surface-2); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:14px; margin-bottom:10px; cursor:pointer; transition:.15s; position:relative; }
+.step-item:hover { border-color:rgba(255,255,255,.12); }
+.step-item.active { border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow); }
+.step-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:var(--surface-3); border-radius:50%; font-size:11px; font-weight:700; color:var(--text-dim); margin-right:8px; }
+.step-item.active .step-num { background:var(--accent); color:#fff; }
+.step-text { font-size:13px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.step-actions { display:flex; gap:8px; margin-top:8px; opacity:0; transition:.15s; }
+.step-item:hover .step-actions { opacity:1; }
+.editor-footer { padding:16px; border-top:1px solid rgba(255,255,255,.06); display:flex; gap:10px; }
+
+/* ============================================================
+   PLAYER SCREEN (The Guided Tour)
+   ============================================================ */
+.player-body { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+.player-stage { position:relative; max-width:95vw; max-height:80vh; background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden; }
+.player-stage iframe, .player-stage img { display:block; border:none; max-width:100%; max-height:80vh; }
+.player-spotlight { position:absolute; width:120px; height:120px; border-radius:50%; box-shadow:0 0 0 9999px rgba(0,0,0,.82); pointer-events:none; transition:all .6s cubic-bezier(.22,1,.36,1); }
+.player-spotlight::after { content:""; position:absolute; inset:-6px; border:2px solid var(--accent); border-radius:50%; animation:pulse 2s infinite; }
+.player-bubble { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-lg); padding:18px 20px; max-width:320px; box-shadow:var(--shadow); transition:all .4s ease; }
+.player-bubble h4 { font-size:14px; margin-bottom:6px; color:var(--accent-2); }
+.player-bubble p { font-size:13px; line-height:1.45; color:var(--text); }
+.player-controls { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:600px; margin-top:20px; padding:0 10px; }
+.player-progress { flex:1; height:4px; background:rgba(255,255,255,.1); border-radius:2px; margin:0 20px; overflow:hidden; }
+.player-progress-bar { height:100%; background:var(--accent); transition:width .5s ease; }
+.player-nav-btns { display:flex; gap:10px; }
+
+/* ============================================================
+   SHARE SCREEN
+   ============================================================ */
+.share-body { display:flex; flex-direction:column; align-items:center; padding:60px 24px; flex:1; }
+.share-card { background:var(--surface); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:36px; width:100%; max-width:480px; text-align:center; }
+.share-card h2 { font-size:22px; margin-bottom:8px; }
+.share-card p { color:var(--text-dim); font-size:15px; margin-bottom:28px; }
+.share-link-box { display:flex; gap:8px; margin-bottom:24px; }
+.share-link-box input { flex:1; }
+.qr-box { margin:24px auto; width:160px; height:160px; background:#fff; border-radius:var(--radius); padding:10px; }
+.qr-box canvas { width:100%; height:100%; }
+.embed-code { background:var(--surface-2); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:14px; text-align:left; font-family:monospace; font-size:12px; color:var(--text-dim); margin-top:16px; word-break:break-all; max-height:120px; overflow:auto; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-lg); padding:14px 22px; font-size:14px; font-weight:600; z-index:300; transition:transform .3s ease; box-shadow:var(--shadow); }
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width:800px) {
+  .editor-sidebar { width:100%; position:fixed; bottom:0; left:0; height:45vh; border-left:none; border-top:1px solid rgba(255,255,255,.06); z-index:90; }
+  .editor-stage { padding-bottom:45vh; }
+  .player-bubble { max-width:260px; font-size:12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none;">
+  <div class="brand" onclick="router('landing')">
+    <div class="brand-icon">DF</div>
+    <span class="brand-title">DemoForge</span>
+    <span class="brand-sub">v0.1</span>
+  </div>
+  <div class="topbar-actions" id="topbar-actions">
+    <button class="btn btn-ghost" onclick="router('landing')" id="btn-new-demo">New Demo</button>
+    <button class="btn btn-primary" onclick="publishDemo()" id="btn-publish">Publish &amp; Share</button>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div class="df-shell active" id="screen-landing">
+  <div class="landing-hero">
+    <h1>Show your product in <span>60 seconds</span>.</h1>
+    <p>Paste any website URL. Add guided hotspots. Share a link. DemoForge builds interactive product walkthroughs that work on every phone — no coding, no design skills, no $300/month fees.</p>
+    <div class="landing-cta">
+      <button class="btn btn-primary btn-lg" onclick="router('capture')">Build a Demo For Free</button>
+      <button class="btn btn-ghost btn-lg" onclick="playSample()">See How It Works</button>
+    </div>
+    <div class="hero-visual">
+      <div class="screen"></div>
+      <div class="hero-overlay">
+        <div class="play-btn" onclick="playSample()">&#9654;</div>
+      </div>
+    </div>
+    <div class="landing-features">
+      <div class="feature-card">
+        <div class="feature-icon">&#128247;</div>
+        <h3>Capture Anything</h3>
+        <p>Paste a website URL or upload a screenshot. DemoForge handles the rest.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128204;</div>
+        <h3>Drop Hotspots</h3>
+        <p>Click anywhere on your screen to add guided pointers with your own words.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127760;</div>
+        <h3>Share One Link</h3>
+        <p>Your prospect opens it on any phone. No app to install. No login needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128176;</div>
+        <h3>Built for Small Biz</h3>
+        <p>Starts at free. Pro is $19/month. No enterprise contract or sales call required.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CAPTURE -->
+<div class="df-shell" id="screen-capture">
+  <div class="capture-body">
+    <div class="capture-card">
+      <h2>What do you want to demo?</h2>
+      <p>Type your website address, or upload a screenshot image.</p>
+      <div class="capture-input-group">
+        <input class="input" placeholder="https://yoursite.com" id="url-input" onkeydown="if(event.key==='Enter')captureURL()" type="url">
+        <button class="btn btn-primary" onclick="captureURL()">Capture</button>
+      </div>
+      <div style="color:var(--text-faint);font-size:13px;margin:4px 0 0 4px;">Tip: Use a public website, or upload a screenshot if your site blocks embedding.</div>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <p><strong>Upload a Screenshot</strong><br>Drag &amp; drop here, or click to browse</p>
+        <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFile(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="df-shell" id="screen-editor">
+  <div class="editor-body">
+    <div class="editor-stage" id="editor-stage">
+      <div class="editor-canvas" id="editor-canvas">
+        <img id="editor-img" style="display:none;pointer-events:none;">
+        <iframe id="editor-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;"></iframe>
+        <div id="editor-overlay" style="display:none;position:absolute;inset:0;z-index:20;background:transparent;cursor:crosshair;"></div>
+      </div>
+    </div>
+    <div class="editor-sidebar">
+      <div class="editor-sidebar-header">
+        <h3 id="demo-title">Demo Steps</h3>
+        <p id="demo-sub">Click anywhere on the screen to add a hotspot. Then write what you want the viewer to see.</p>
+      </div>
+      <div class="steps-list" id="steps-list"></div>
+      <div class="editor-footer">
+        <button class="btn btn-primary" onclick="previewDemo()" style="flex:1;">&#9654; Preview Tour</button>
+        <button class="btn btn-ghost" onclick="router('landing')">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div class="df-shell" id="screen-player">
+  <div class="player-body" id="player-body">
+    <div class="player-stage" id="player-stage">
+      <img id="player-img" style="display:none;">
+      <iframe id="player-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;width:900px;height:640px;"></iframe>
+      <div class="player-spotlight" id="player-spotlight"></div>
+      <div class="player-bubble" id="player-bubble">
+        <h4 id="bubble-step">Step 1</h4>
+        <p id="bubble-text">Welcome to the demo.</p>
+      </div>
+    </div>
+    <div class="player-controls">
+      <button class="btn btn-ghost btn-sm" onclick="prevStep()">&#9664; Back</button>
+      <div class="player-progress">
+        <div class="player-progress-bar" id="player-progress" style="width:0%"></div>
+      </div>
+      <div class="player-nav-btns">
+        <button class="btn btn-primary btn-sm" onclick="nextStep()">Next &#9654;</button>
+        <button class="btn btn-ghost btn-sm" onclick="exitPlayer()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE -->
+<div class="df-shell" id="screen-share">
+  <div class="share-body">
+    <div class="share-card">
+      <h2>Your demo is live.</h2>
+      <p>Copy this link and send it to your prospect. They open it on any phone — no app, no login.</p>
+      <div class="share-link-box">
+        <input class="input" id="share-input" readonly type="text">
+        <button class="btn btn-primary" onclick="copyShare()">Copy</button>
+      </div>
+      <p class="qr-box" id="qr-box"><canvas id="qr-canvas"></canvas></p>
+      <p style="color:var(--text-faint);font-size:12px;margin-top:8px;">Scan this QR code to preview on your phone.</p>
+      <div class="embed-code" id="embed-code"></div>
+      <button class="btn btn-ghost" style="margin-top:16px;" onclick="router('editor')">Back to Editor</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========= STATE ========= */
+const state = {
+  screen:'landing',
+  source:{ type:null, url:null, imageData:null },
+  hotspots:[],
+  activeHotspot:null,
+  currentStep:0,
+  demoId:null,
+  serverBase:(window.location.protocol+'//'+window.location.host),
+};
+
+/* ========= ROUTER ========= */
+function router(name) {
+  state.screen=name;
+  document.querySelectorAll('.df-shell').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('screen-'+name);
+  if(el)el.classList.add('active');
+  document.getElementById('topbar').style.display=(name==='landing'||name==='capture')?'none':'flex';
+  if(name==='editor') renderSteps();
+  if(name==='landing') resetState();
+  if(name==='share')  renderShare();
+}
+function resetState(){
+  state.source={type:null,url:null,imageData:null};
+  state.hotspots=[]; state.activeHotspot=null; state.currentStep=0; state.demoId=null;
+  document.getElementById('editor-img').style.display='none';
+  document.getElementById('editor-iframe').style.display='none';
+  document.getElementById('editor-img').src='';
+  document.getElementById('editor-iframe').src='about:blank';
+  document.getElementById('editor-canvas').querySelectorAll('.hotspot').forEach(el=>el.remove());
+  nextHotspotId=1;
+  clearHotspotForms();
+}
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ========= CAPTURE ========= */
+function captureURL(){
+  let url=document.getElementById('url-input').value.trim();
+  if(!url){showToast('Please enter a website address.'); return;}
+  if(!/^https?:\/\//.test(url)){url='https://'+url;}
+  state.source={type:'url',url:url,imageData:null};
+  enterEditor();
+}
+function handleFile(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    state.source={type:'image',url:null,imageData:e.target.result};
+    enterEditor();
+  };
+  reader.readAsDataURL(f);
+}
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave',e=>{e.preventDefault();dz.classList.remove('dragover');});
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('dragover');
+  const f=e.dataTransfer.files[0];
+  if(f){const r=new FileReader();r.onload=function(ev){state.source={type:'image',url:null,imageData:ev.target.result};enterEditor();};r.readAsDataURL(f);}
+});
+
+function enterEditor(){
+  router('editor');
+  const img=document.getElementById('editor-img');
+  const iframe=document.getElementById('editor-iframe');
+  const canvas=document.getElementById('editor-canvas');
+  const overlay=document.getElementById('editor-overlay');
+  if(state.source.type==='image'){
+    img.src=state.source.imageData; img.style.display='block'; iframe.style.display='none';
+    img.onload=()=>{canvas.style.width=img.naturalWidth+'px'; canvas.style.height=img.naturalHeight+'px';};
+    overlay.style.display='none';
+  }else{
+    iframe.src=state.source.url; iframe.style.display='block'; img.style.display='none';
+    iframe.style.width='900px'; iframe.style.height='640px';
+    canvas.style.width='900px'; canvas.style.height='640px';
+    overlay.style.display='block';
+  }
+  setupEditorClick();
+}
+
+/* ========= EDITOR ========= */
+let nextHotspotId=1;
+function setupEditorClick(){
+  const overlay=document.getElementById('editor-overlay');
+  const canvas=document.getElementById('editor-canvas');
+  overlay.onclick=null;
+  canvas.onclick=null;
+  const handler=function(e){
+    const rect=canvas.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+    const pctX=(x/rect.width);
+    const pctY=(y/rect.height);
+    addHotspot(x,y,pctX,pctY);
+  };
+  if(state.source.type==='url'){
+    overlay.onclick=handler;
+  }else{
+    canvas.onclick=handler;
+  }
+}
+function addHotspot(x,y,pctX,pctY){
+  const id=nextHotspotId++;
+  const hotspot={id,x,y,pctX,pctY,text:'Click here to learn more about this feature.'};
+  state.hotspots.push(hotspot);
+  state.activeHotspot=id;
+  renderHotspot(hotspot);
+  renderSteps();
+  setTimeout(()=>openInlineEditor(id),10);
+}
+function renderHotspot(h){
+  const canvas=document.getElementById('editor-canvas');
+  const el=document.createElement('div');
+  el.className='hotspot';
+  el.id='hs-'+h.id;
+  el.style.left=(h.pctX*100)+'%';
+  el.style.top=(h.pctY*100)+'%';
+  el.textContent=h.id;
+  el.onclick=function(e){e.stopPropagation(); state.activeHotspot=h.id; highlightStep(h.id); openInlineEditor(h.id);};
+  canvas.appendChild(el);
+}
+function openInlineEditor(id){
+  clearHotspotForms();
+  const h=state.hotspots.find(x=>x.id===id); if(!h)return;
+  const canvas=document.getElementById('editor-canvas');
+  const form=document.createElement('div');
+  form.className='hotspot-editor-form';
+  form.id='inline-editor';
+  const px=h.pctX*canvas.offsetWidth, py=h.pctY*canvas.offsetHeight;
+  let fx=px+20, fy=py-20;
+  if(fx+280>canvas.offsetWidth) fx=px-300;
+  if(fy+140>canvas.offsetHeight) fy=py-140;
+  if(fy<0) fy=10;
+  form.style.left=fx+'px'; form.style.top=fy+'px';
+  form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+escapeHtml(h.text)+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="saveHotspot('+id+')">Save</button></div>';
+  canvas.appendChild(form);
+  document.getElementById('hs-text-'+id).focus();
+}
+function clearHotspotForms(){
+  const old=document.getElementById('inline-editor'); if(old)old.remove();
+}
+function saveHotspot(id){
+  const ta=document.getElementById('hs-text-'+id);
+  const h=state.hotspots.find(x=>x.id===id); if(h && ta){h.text=ta.value;}
+  clearHotspotForms(); renderSteps(); showToast('Step saved.');
+}
+function deleteHotspot(id){
+  state.hotspots=state.hotspots.filter(x=>x.id!==id);
+  const el=document.getElementById('hs-'+id); if(el)el.remove();
+  clearHotspotForms(); renderSteps();
+}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+
+function renderSteps(){
+  const list=document.getElementById('steps-list');
+  if(state.hotspots.length===0){
+    list.innerHTML='<div style="text-align:center;color:var(--text-faint);padding:40px 20px;"><p style="font-size:28px;margin-bottom:10px;">&#128204;</p><p>Click anywhere on the screen to add your first hotspot.</p></div>';
+    document.getElementById('demo-title').textContent='Demo Steps';
+    return;
+  }
+  list.innerHTML=state.hotspots.map((h,i)=>'<div class="step-item '+(state.activeHotspot===h.id?'active':'')+'" onclick="highlightStep('+h.id+')">'+
+    '<span class="step-num">'+(i+1)+'</span><span class="step-text">'+escapeHtml(h.text)+'</span>'+
+    '<div class="step-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
+    '</div>').join('');
+  document.getElementById('demo-title').textContent=state.hotspots.length+' Step'+(state.hotspots.length===1?'':'s');
+}
+function highlightStep(id){
+  state.activeHotspot=id;
+  document.querySelectorAll('.hotspot').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('hs-'+id); if(el)el.classList.add('active');
+  renderSteps();
+}
+function moveHotspot(idx,dir){
+  const nIdx=idx+dir; if(nIdx<0||nIdx>=state.hotspots.length)return;
+  const tmp=state.hotspots[idx]; state.hotspots[idx]=state.hotspots[nIdx]; state.hotspots[nIdx]=tmp;
+  renderSteps();
+}
+
+/* ========= PLAYER ========= */
+function previewDemo(){ playFromStep(0); }
+function playSample(){
+  state.source={type:'url',url:'https://example.com',imageData:null};
+  state.hotspots=[
+    {id:1,pctX:.25,pctY:.35,text:'Your customers land here and immediately see what you offer. No confusion, no clicks to dig.'},
+    {id:2,pctX:.55,pctY:.22,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
+    {id:3,pctX:.72,pctY:.62,text:'Your reviews front and center. Social proof sells while you sleep.'},
+  ];
+  playFromStep(0);
+}
+function playFromStep(idx){
+  if(state.hotspots.length===0){showToast('Add at least one hotspot first.'); return;}
+  state.currentStep=idx;
+  router('player');
+  const img=document.getElementById('player-img');
+  const iframe=document.getElementById('player-iframe');
+  const stage=document.getElementById('player-stage');
+  if(state.source.type==='image'){
+    img.src=state.source.imageData; img.style.display='block'; iframe.style.display='none';
+    img.onload=()=>{ stage.style.width=img.naturalWidth+'px'; stage.style.height=img.naturalHeight+'px'; };
+  }else{
+    iframe.src=state.source.url; iframe.style.display='block'; img.style.display='none';
+    stage.style.width='900px'; stage.style.height='640px';
+  }
+  renderPlayerStep();
+}
+function renderPlayerStep(){
+  const h=state.hotspots[state.currentStep];
+  const spot=document.getElementById('player-spotlight');
+  const bubble=document.getElementById('player-bubble');
+  const stage=document.getElementById('player-stage');
+  if(!h){ exitPlayer(); return; }
+  const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
+  spot.style.left=(sx-60)+'px'; spot.style.top=(sy-60)+'px';
+  let bx=sx+80, by=sy;
+  if(bx+320>stage.offsetWidth){bx=sx-340;}
+  if(by+120>stage.offsetHeight){by=stage.offsetHeight-130;}
+  if(by<10){by=10;}
+  bubble.style.left=bx+'px'; bubble.style.top=by+'px';
+  document.getElementById('bubble-step').textContent='Step '+(state.currentStep+1)+' of '+state.hotspots.length;
+  document.getElementById('bubble-text').textContent=h.text;
+  const pct=((state.currentStep+1)/state.hotspots.length)*100;
+  document.getElementById('player-progress').style.width=pct+'%';
+}
+function nextStep(){ if(state.currentStep<state.hotspots.length-1){state.currentStep++; renderPlayerStep();} else { showToast('Demo complete!'); } }
+function prevStep(){ if(state.currentStep>0){state.currentStep--; renderPlayerStep();} }
+function exitPlayer(){ router('editor'); }
+
+/* ========= QR & SHARE ========= */
+function drawQR(canvas,text,size){
+  const ctx=canvas.getContext('2d');
+  const cell=size/25;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='#000';
+  let idx=0;
+  for(let r=0;r<25;r++){
+    for(let c=0;c<25;c++){
+      if(c<7 && r<7){ if(c===0||c===6||r===0||r===6||((c>=2&&c<=4)&&(r>=2&&r<=4))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
+      if(c>=18 && r<7){ if(c===18||c===24||r===0||r===6||((c>=20&&c<=22)&&(r>=2&&r<=4))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
+      if(c<7 && r>=18){ if(c===0||c===6||r===18||r===24||((c>=2&&c<=4)&&(r>=20&&r<=22))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
+      idx=(idx+1)%text.length;
+      if((text.charCodeAt(idx)+r+c)%2) ctx.fillRect(c*cell,r*cell,cell,cell);
+    }
+  }
+}
+
+async function publishDemo(){
+  if(state.hotspots.length===0){showToast('Add at least one step before sharing.'); return;}
+  const payload={
+    title:'My Demo',
+    source: state.source,
+    hotspots: state.hotspots.map(h=>({pctX:h.pctX,pctY:h.pctY,text:h.text}))
+  };
+  try{
+    const r=await fetch(state.serverBase+'/api/demos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error('Server error');
+    const data=await r.json();
+    state.demoId=data.id;
+    router('share');
+  }catch(e){
+    const hash=btoa(encodeURIComponent(JSON.stringify(payload))).slice(0,60);
+    state.demoId='local_'+hash;
+    router('share');
+  }
+}
+function renderShare(){
+  let url;
+  if(state.demoId && state.demoId.startsWith('local_')){
+    const payload={source:state.source,hotspots:state.hotspots};
+    const hash=btoa(encodeURIComponent(JSON.stringify(payload)));
+    url=window.location.origin+window.location.pathname+'#play='+hash;
+  }else{
+    url=state.serverBase+'/play/'+state.demoId;
+  }
+  document.getElementById('share-input').value=url;
+  document.getElementById('embed-code').textContent='<iframe src="'+url+'" width="100%" height="600" frameborder="0"></iframe>';
+  const cvs=document.getElementById('qr-canvas');
+  if(cvs) drawQR(cvs,url,140);
+}
+function copyShare(){
+  const el=document.getElementById('share-input'); el.select();
+  navigator.clipboard.writeText(el.value).then(()=>showToast('Link copied!'));
+}
+
+/* ========= HASH PLAYBACK ========= */
+function handleHash(){
+  const hash=window.location.hash;
+  if(hash.startsWith('#play=')){
+    try{
+      const payload=JSON.parse(decodeURIComponent(atob(hash.slice(6))));
+      state.source=payload.source;
+      state.hotspots=(payload.hotspots||[]).map((h,i)=>({id:i+1,...h}));
+      playFromStep(0);
+      return;
+    }catch(e){ console.error('Bad hash',e); }
+  }
+  router('landing');
+}
+window.addEventListener('hashchange',handleHash);
+handleHash();
+</script>
+</body>
+</html>

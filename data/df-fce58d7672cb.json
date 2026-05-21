@@ -1,0 +1,26 @@
+{
+  "id": "df-fce58d7672cb",
+  "title": "My Demo",
+  "source": {
+    "type": "url",
+    "url": "https://eyedoctormountvernon.com",
+    "imageData": null
+  },
+  "hotspots": [
+    {
+      "pctX": 0.0539609644087256,
+      "pctY": 0.5703125,
+      "text": "Click here to learn more about this feature."
+    },
+    {
+      "pctX": 0.56601607347876,
+      "pctY": 0.5796875,
+      "text": "Click here to learn more about this feature."
+    },
+    {
+      "pctX": 0.4833524684270953,
+      "pctY": 0.1578125,
+      "text": "Click here to learn more about this feature."
+    }
+  ]
+}
