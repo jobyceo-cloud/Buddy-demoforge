@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-DemoForge Server — Python backend for demo storage, playback, and URL proxying.
+DemoForge Server -- Python backend for demo storage, playback, and URL capture.
 Serves the frontend from ./index.html, stores demos as JSON files, and handles
-iframe proxying for sites that block embedding.
+server-side screenshot capture via Playwright.
 """
 
-import json, os, uuid, urllib.request, urllib.error, html
+import json, os, uuid, urllib.request, urllib.error, html, base64
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs, unquote
 
@@ -49,6 +49,25 @@ def list_demos() -> list:
             with open(path, "r", encoding="utf-8") as f:
                 demos.append(json.load(f))
     return demos
+
+# ------------------------------------------------------------------
+# Screenshot capture
+# ------------------------------------------------------------------
+def capture_screenshot(url: str):
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return None, "Playwright not installed. Run: pip install playwright && playwright install chromium"
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(viewport={"width": 1280, "height": 800})
+            page.goto(url, wait_until="networkidle", timeout=15000)
+            screenshot = page.screenshot(type="png", full_page=False)
+            browser.close()
+        return base64.b64encode(screenshot).decode("utf-8"), None
+    except Exception as e:
+        return None, str(e)
 
 # ------------------------------------------------------------------
 # Request handler
@@ -113,7 +132,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({"error": "Demo not found"}, 404)
             return
 
-        # API: proxy HTML for iframing
+        # API: proxy HTML for iframing (legacy)
         if path.startswith("/api/proxy"):
             url = qs.get("url", [""])[0]
             if not url.startswith(("http://", "https://")):
@@ -166,7 +185,11 @@ class Handler(BaseHTTPRequestHandler):
                 if not url.startswith(("http://", "https://")):
                     self.send_json({"error": "Invalid URL"}, 400)
                     return
-                self.send_json({"url": url, "note": "Screenshot capture requires headless browser (playwright/puppeteer)."})
+                b64, err = capture_screenshot(url)
+                if err or not b64:
+                    self.send_json({"error": "This site blocks screenshots. Upload a screenshot manually instead.", "detail": err}, 422)
+                    return
+                self.send_json({"imageData": "data:image/png;base64," + b64})
             except Exception as e:
                 self.send_json({"error": str(e)}, 500)
             return
@@ -186,30 +209,33 @@ class Handler(BaseHTTPRequestHandler):
             "<style>\n"
             "*,::before,::after { box-sizing:border-box;margin:0;padding:0 }\n"
             "body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#0b0f19;color:#e5e7eb;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px }\n"
-            ".stage { position:relative;background:#111827;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.35);max-width:95vw;max-height:75vh }\n"
-            ".stage img, .stage iframe { display:block;max-width:100%;max-height:75vh;border:none }\n"
+            ".stage { position:relative;background:#111827;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.35);max-width:95vw;max-height:70vh;width:auto;height:auto;display:flex;align-items:center;justify-content:center }\n"
+            ".stage img { display:block;max-width:100%;max-height:70vh;height:auto;border:none }\n"
+            ".stage iframe { display:block;max-width:100%;max-height:70vh;border:none;width:900px;height:640px }\n"
             ".bubble { position:absolute;background:#1a2332;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:16px 18px;max-width:300px;box-shadow:0 10px 40px rgba(0,0,0,.35);transition:all .4s }\n"
             ".bubble h4 { font-size:13px;color:#22d3ee;margin-bottom:4px }\n"
             ".bubble p { font-size:13px;line-height:1.45;color:#e5e7eb }\n"
-            ".controls { display:flex;align-items:center;gap:16px;margin-top:18px;width:100%;max-width:500px }\n"
+            ".controls { display:flex;align-items:center;gap:16px;margin-top:18px;width:100%;max-width:500px;padding:0 10px }\n"
             ".progress { flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden }\n"
             ".progress > div { height:100%;background:#0ea5e9;transition:width .4s }\n"
-            ".btn { padding:8px 18px;border-radius:8px;background:#0ea5e9;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer }\n"
+            ".btn { padding:12px 22px;border-radius:10px;background:#0ea5e9;color:#fff;border:none;font-size:15px;font-weight:600;cursor:pointer;min-width:80px }\n"
+            ".btn-sec { background:#1a2332 }\n"
             ".header { margin-bottom:16px;text-align:center }\n"
             ".header h2 { font-size:18px;font-weight:700 }\n"
             ".header p { font-size:13px;color:#9ca3af;margin-top:4px }\n"
             ".spotlight { position:absolute;width:100px;height:100px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.75);transition:all .5s ease;pointer-events:none }\n"
             ".spotlight::after { content:'';position:absolute;inset:-4px;border:2px solid #0ea5e9;border-radius:50%;animation:pulse 2s infinite }\n"
             "@keyframes pulse { 0% {opacity:1} 50% {opacity:.6} 100% {opacity:1} }\n"
+            "@media (max-width:600px){ .btn { padding:14px 24px;font-size:16px } .bubble { max-width:260px;padding:14px } }\n"
             "</style>\n"
             "</head>\n"
             "<body>\n"
             "<div class='header'><h2>" + title + "</h2><p>Click Next to walk through</p></div>\n"
             "<div class='stage' id='stage'><img id='img' style='display:none'><iframe id='frame' sandbox='allow-scripts allow-same-origin allow-forms' style='display:none;width:900px;height:640px'></iframe><div class='spotlight' id='spot'></div><div class='bubble' id='bubble'><h4 id='b-step'>Step 1</h4><p id='b-text'>Loading...</p></div></div>\n"
             "<div class='controls'>\n"
-            "  <button class='btn' onclick='prev()' style='background:#1a2332'>Back</button>\n"
+            "  <button class='btn btn-sec' onclick='prev()' style='min-width:80px'>Back</button>\n"
             "  <div class='progress'><div id='prog' style='width:0%'></div></div>\n"
-            "  <button class='btn' onclick='next()'>Next</button>\n"
+            "  <button class='btn' onclick='next()' style='min-width:80px'>Next</button>\n"
             "</div>\n"
             "<script>\n"
             "const demo = " + demo_json + ";\n"
@@ -223,6 +249,7 @@ class Handler(BaseHTTPRequestHandler):
             "const prog = document.getElementById('prog');\n"
             "const img = document.getElementById('img');\n"
             "const frame = document.getElementById('frame');\n"
+            "function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }\n"
             "function render() {\n"
             "  const h = hotspots[cur];\n"
             "  if (!h) return;\n"
@@ -230,9 +257,14 @@ class Handler(BaseHTTPRequestHandler):
             "  spot.style.left = (sx - 50) + 'px';\n"
             "  spot.style.top = (sy - 50) + 'px';\n"
             "  let bx = sx + 70, by = sy;\n"
-            "  if (bx + 300 > stage.offsetWidth) bx = sx - 320;\n"
-            "  if (by + 100 > stage.offsetHeight) by = stage.offsetHeight - 110;\n"
-            "  if (by < 10) by = 10;\n"
+            "  const vpW = window.innerWidth, vpH = window.innerHeight;\n"
+            "  const sRect = stage.getBoundingClientRect();\n"
+            "  let viewBx = sRect.left + bx, viewBy = sRect.top + by;\n"
+            "  if (viewBx + bubble.offsetWidth > vpW - 10) viewBx = vpW - bubble.offsetWidth - 10;\n"
+            "  if (viewBx < 10) viewBx = 10;\n"
+            "  if (viewBy + bubble.offsetHeight > vpH - 10) viewBy = vpH - bubble.offsetHeight - 10;\n"
+            "  if (viewBy < 10) viewBy = 10;\n"
+            "  bx = viewBx - sRect.left; by = viewBy - sRect.top;\n"
             "  bubble.style.left = bx + 'px';\n"
             "  bubble.style.top = by + 'px';\n"
             "  bStep.textContent = 'Step ' + (cur+1) + ' of ' + hotspots.length;\n"
@@ -244,8 +276,10 @@ class Handler(BaseHTTPRequestHandler):
             "if(demo.source.type === 'image'){\n"
             "  img.src = demo.source.imageData;\n"
             "  img.style.display = 'block';\n"
+            "  img.style.maxWidth = '100%';\n"
+            "  img.style.height = 'auto';\n"
             "  frame.style.display = 'none';\n"
-            "  img.addEventListener('load', function(){ stage.style.width=img.naturalWidth+'px'; stage.style.height=img.naturalHeight+'px'; render(); });\n"
+            "  img.addEventListener('load', function(){ stage.style.width='auto'; stage.style.height='auto'; render(); });\n"
             "} else {\n"
             "  img.style.display = 'none';\n"
             "  frame.style.display = 'block';\n"
@@ -261,7 +295,7 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     print(f"""
 +----------------------------------------------+
-|  DemoForge Server v0.1                       |
+|  DemoForge Server v0.2                       |
 |  URL:   http://localhost:{PORT}                  |
 |  Dir:   {DATA_DIR}        |
 +----------------------------------------------+

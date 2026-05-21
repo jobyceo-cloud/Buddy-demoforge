@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DemoForge — Turn Any Website Into a Guided Tour</title>
+<title>DemoForge - Turn Any Website Into a Guided Tour</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 /* ============================================================
-   DemoForge — Global Reset & Design System
+   DemoForge - Global Reset & Design System
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
 :root {
@@ -28,6 +29,8 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(14,165,233,.5)} 70%{box-shadow:0 0 0 18px rgba(14,165,233,0)} 100%{box-shadow:0 0 0 0 rgba(14,165,233,0)} }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes hintSlide { 0%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 100%{transform:translateX(-6px)} }
+@keyframes spin { to{transform:rotate(360deg)} }
 
 /* ============================================================
    Layout Shell
@@ -78,23 +81,35 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
    CAPTURE SCREEN
    ============================================================ */
 .capture-body { display:flex; flex-direction:column; align-items:center; padding:60px 24px; flex:1; }
-.capture-card { background:var(--surface); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:36px; width:100%; max-width:560px; text-align:center; }
+.capture-card { background:var(--surface); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:36px; width:100%; max-width:560px; text-align:center; position:relative; }
 .capture-card h2 { font-size:22px; margin-bottom:8px; }
 .capture-card p { color:var(--text-dim); font-size:15px; margin-bottom:28px; }
 .capture-input-group { display:flex; gap:10px; margin-bottom:16px; }
 .capture-input-group .input { flex:1; }
+.capture-title-group { text-align:left; margin-bottom:16px; }
+.capture-title-group label { display:block; font-size:12px; color:var(--text-dim); margin-bottom:4px; }
 .drop-zone { border:2px dashed rgba(255,255,255,.15); border-radius:var(--radius-lg); padding:36px; margin-top:16px; cursor:pointer; transition:.2s; }
 .drop-zone:hover, .drop-zone.dragover { border-color:var(--accent); background:rgba(14,165,233,.05); }
 .drop-zone p { color:var(--text-dim); font-size:14px; margin:0; }
+
+.spinner-overlay { position:absolute; inset:0; background:rgba(11,15,25,.85); border-radius:var(--radius-lg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:10; }
+.spinner-overlay.hidden { display:none; }
+.spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,.1); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin-bottom:12px; }
+.spinner-overlay p { font-size:14px; color:var(--text-dim); }
+
+.capture-error { background:var(--surface-2); border:1px solid rgba(239,68,68,.3); border-radius:var(--radius); padding:14px; margin-top:14px; text-align:left; display:none; }
+.capture-error.show { display:block; }
+.capture-error p { font-size:13px; color:var(--danger); margin-bottom:10px; }
 
 /* ============================================================
    EDITOR SCREEN
    ============================================================ */
 .editor-body { display:flex; flex:1; overflow:hidden; }
-.editor-stage { flex:1; position:relative; background:#000; display:flex; align-items:center; justify-content:center; overflow:auto; padding:24px; }
-.editor-canvas { position:relative; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-.editor-canvas iframe, .editor-canvas img { display:block; border:none; max-width:100%; }
-.hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; cursor:pointer; animation:pulse 2s infinite; transform:translate(-50%,-50%); box-shadow:0 0 12px var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; }
+.editor-stage { flex:1; position:relative; background:#000; display:flex; align-items:flex-start; justify-content:flex-start; overflow:auto; padding:24px; cursor:grab; }
+.editor-stage:active { cursor:grabbing; }
+.editor-canvas { position:relative; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; transform-origin:0 0; flex-shrink:0; }
+.editor-canvas iframe, .editor-canvas img { display:block; border:none; max-width:100%; pointer-events:none; user-select:none; }
+.hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; cursor:pointer; animation:pulse 2s infinite; transform:translate(-50%,-50%); box-shadow:0 0 12px var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; z-index:5; }
 .hotspot.active { background:var(--warn); box-shadow:0 0 12px var(--warn); }
 .hotspot-editor-form { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:14px; width:280px; z-index:20; box-shadow:var(--shadow); }
 .hotspot-editor-form textarea { width:100%; min-height:70px; resize:vertical; background:var(--surface-3); border:1px solid rgba(255,255,255,.1); border-radius:6px; padding:8px; font-size:13px; color:var(--text); margin-bottom:10px; }
@@ -115,15 +130,22 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .step-item:hover .step-actions { opacity:1; }
 .editor-footer { padding:16px; border-top:1px solid rgba(255,255,255,.06); display:flex; gap:10px; }
 
+.editor-hint { position:absolute; inset:0; z-index:15; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.editor-hint.hidden { display:none; }
+.editor-hint-box { background:rgba(11,15,25,.85); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-lg); padding:20px 28px; text-align:center; backdrop-filter:blur(4px); pointer-events:auto; }
+.editor-hint-box p { font-size:15px; color:var(--text); margin-bottom:6px; }
+.editor-hint-box .arrow { font-size:24px; color:var(--accent); animation:hintSlide 1.5s ease-in-out infinite; display:inline-block; }
+
 /* ============================================================
    PLAYER SCREEN (The Guided Tour)
    ============================================================ */
 .player-body { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
-.player-stage { position:relative; max-width:95vw; max-height:80vh; background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden; }
-.player-stage iframe, .player-stage img { display:block; border:none; max-width:100%; max-height:80vh; }
+.player-stage { position:relative; max-width:95vw; max-height:70vh; width:auto; height:auto; background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow); overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.player-stage iframe { display:none; border:none; width:900px; height:640px; max-width:95vw; max-height:70vh; }
+.player-stage img { display:none; border:none; max-width:100%; max-height:70vh; height:auto; }
 .player-spotlight { position:absolute; width:120px; height:120px; border-radius:50%; box-shadow:0 0 0 9999px rgba(0,0,0,.82); pointer-events:none; transition:all .6s cubic-bezier(.22,1,.36,1); }
 .player-spotlight::after { content:""; position:absolute; inset:-6px; border:2px solid var(--accent); border-radius:50%; animation:pulse 2s infinite; }
-.player-bubble { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-lg); padding:18px 20px; max-width:320px; box-shadow:var(--shadow); transition:all .4s ease; }
+.player-bubble { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-lg); padding:18px 20px; max-width:300px; box-shadow:var(--shadow); transition:all .4s ease; z-index:10; }
 .player-bubble h4 { font-size:14px; margin-bottom:6px; color:var(--accent-2); }
 .player-bubble p { font-size:13px; line-height:1.45; color:var(--text); }
 .player-controls { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:600px; margin-top:20px; padding:0 10px; }
@@ -142,12 +164,14 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .share-link-box input { flex:1; }
 .qr-box { margin:24px auto; width:160px; height:160px; background:#fff; border-radius:var(--radius); padding:10px; }
 .qr-box canvas { width:100%; height:100%; }
-.embed-code { background:var(--surface-2); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:14px; text-align:left; font-family:monospace; font-size:12px; color:var(--text-dim); margin-top:16px; word-break:break-all; max-height:120px; overflow:auto; }
+.embed-actions { display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+.embed-code { background:var(--surface-2); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:14px; text-align:left; font-family:monospace; font-size:12px; color:var(--text-dim); margin-top:16px; word-break:break-all; max-height:120px; overflow:auto; display:none; }
+.embed-code.show { display:block; }
 
 /* ============================================================
    TOAST
    ============================================================ */
-.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-lg); padding:14px 22px; font-size:14px; font-weight:600; z-index:300; transition:transform .3s ease; box-shadow:var(--shadow); }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-lg); padding:14px 22px; font-size:14px; font-weight:600; z-index:300; transition:transform .3s ease; box-shadow:var(--shadow); display:flex; gap:12px; align-items:center; }
 .toast.show { transform:translateX(-50%) translateY(0); }
 
 /* ============================================================
@@ -156,7 +180,13 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 @media (max-width:800px) {
   .editor-sidebar { width:100%; position:fixed; bottom:0; left:0; height:45vh; border-left:none; border-top:1px solid rgba(255,255,255,.06); z-index:90; }
   .editor-stage { padding-bottom:45vh; }
-  .player-bubble { max-width:260px; font-size:12px; }
+  .player-bubble { max-width:260px; font-size:12px; padding:14px; }
+  .player-stage { max-height:65vh; }
+  .btn-lg { padding:12px 20px; font-size:15px; }
+}
+@media (max-width:600px) {
+  .player-controls .btn { padding:14px 20px; font-size:16px; min-width:90px; }
+  .player-bubble { max-width:220px; }
 }
 </style>
 </head>
@@ -167,13 +197,13 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 
 <!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none;">
-  <div class="brand" onclick="router('landing')">
+  <div class="brand" onclick="newDemoConfirm()">
     <div class="brand-icon">DF</div>
     <span class="brand-title">DemoForge</span>
-    <span class="brand-sub">v0.1</span>
+    <span class="brand-sub">v0.2</span>
   </div>
   <div class="topbar-actions" id="topbar-actions">
-    <button class="btn btn-ghost" onclick="router('landing')" id="btn-new-demo">New Demo</button>
+    <button class="btn btn-ghost" onclick="newDemoConfirm()" id="btn-new-demo">New Demo</button>
     <button class="btn btn-primary" onclick="publishDemo()" id="btn-publish">Publish &amp; Share</button>
   </div>
 </div>
@@ -182,7 +212,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 <div class="df-shell active" id="screen-landing">
   <div class="landing-hero">
     <h1>Show your product in <span>60 seconds</span>.</h1>
-    <p>Paste any website URL. Add guided hotspots. Share a link. DemoForge builds interactive product walkthroughs that work on every phone — no coding, no design skills, no $300/month fees.</p>
+    <p>Paste any website URL. Add guided hotspots. Share a link. DemoForge builds interactive product walkthroughs that work on every phone -- no coding, no design skills, no $300/month fees.</p>
     <div class="landing-cta">
       <button class="btn btn-primary btn-lg" onclick="router('capture')">Build a Demo For Free</button>
       <button class="btn btn-ghost btn-lg" onclick="playSample()">See How It Works</button>
@@ -224,14 +254,28 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
     <div class="capture-card">
       <h2>What do you want to demo?</h2>
       <p>Type your website address, or upload a screenshot image.</p>
+      <div class="capture-title-group">
+        <label for="demo-title-input">Demo Name</label>
+        <input class="input" id="demo-title-input" type="text" value="My Product Demo" placeholder="e.g. Mike's Pest Control">
+      </div>
       <div class="capture-input-group">
         <input class="input" placeholder="https://yoursite.com" id="url-input" onkeydown="if(event.key==='Enter')captureURL()" type="url">
-        <button class="btn btn-primary" onclick="captureURL()">Capture</button>
+        <button class="btn btn-primary" id="capture-btn" onclick="captureURL()">Capture</button>
       </div>
-      <div style="color:var(--text-faint);font-size:13px;margin:4px 0 0 4px;">Tip: Use a public website, or upload a screenshot if your site blocks embedding.</div>
+      <div style="color:var(--text-faint);font-size:13px;margin:4px 0 0 4px;">Tip: We will take a screenshot automatically. If it fails, upload one manually.</div>
       <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
         <p><strong>Upload a Screenshot</strong><br>Drag &amp; drop here, or click to browse</p>
         <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFile(event)">
+      </div>
+
+      <div class="spinner-overlay hidden" id="capture-spinner">
+        <div class="spinner"></div>
+        <p>Taking screenshot... (up to 10 seconds)</p>
+      </div>
+
+      <div class="capture-error" id="capture-error">
+        <p id="capture-error-msg">This site blocks screenshots. Upload a screenshot manually instead.</p>
+        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">Upload Screenshot</button>
       </div>
     </div>
   </div>
@@ -242,9 +286,15 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
   <div class="editor-body">
     <div class="editor-stage" id="editor-stage">
       <div class="editor-canvas" id="editor-canvas">
-        <img id="editor-img" style="display:none;pointer-events:none;">
-        <iframe id="editor-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;"></iframe>
-        <div id="editor-overlay" style="display:none;position:absolute;inset:0;z-index:20;background:transparent;cursor:crosshair;"></div>
+        <img id="editor-img" style="display:none;pointer-events:none;user-select:none;">
+        <iframe id="editor-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;pointer-events:none;"></iframe>
+        <div id="editor-overlay" style="display:none;position:absolute;inset:0;z-index:4;background:transparent;cursor:crosshair;"></div>
+      </div>
+      <div class="editor-hint hidden" id="editor-hint">
+        <div class="editor-hint-box" onclick="dismissHint()">
+          <p>Tap where you want your customer to look first</p>
+          <div class="arrow">&#10132;</div>
+        </div>
       </div>
     </div>
     <div class="editor-sidebar">
@@ -266,7 +316,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
   <div class="player-body" id="player-body">
     <div class="player-stage" id="player-stage">
       <img id="player-img" style="display:none;">
-      <iframe id="player-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;width:900px;height:640px;"></iframe>
+      <iframe id="player-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" style="display:none;"></iframe>
       <div class="player-spotlight" id="player-spotlight"></div>
       <div class="player-bubble" id="player-bubble">
         <h4 id="bubble-step">Step 1</h4>
@@ -290,14 +340,18 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 <div class="df-shell" id="screen-share">
   <div class="share-body">
     <div class="share-card">
-      <h2>Your demo is live.</h2>
-      <p>Copy this link and send it to your prospect. They open it on any phone — no app, no login.</p>
+      <h2 id="share-title">Your demo is live.</h2>
+      <p>Copy this link and send it to your prospect. They open it on any phone -- no app, no login.</p>
       <div class="share-link-box">
         <input class="input" id="share-input" readonly type="text">
         <button class="btn btn-primary" onclick="copyShare()">Copy</button>
       </div>
-      <p class="qr-box" id="qr-box"><canvas id="qr-canvas"></canvas></p>
+      <p class="qr-box" id="qr-box"></p>
       <p style="color:var(--text-faint);font-size:12px;margin-top:8px;">Scan this QR code to preview on your phone.</p>
+      <div class="embed-actions">
+        <button class="btn btn-ghost" onclick="copyLinkPlain()">Copy link to send in text/email</button>
+        <button class="btn btn-ghost" onclick="showEmbedCode()">Copy embed code for your website</button>
+      </div>
       <div class="embed-code" id="embed-code"></div>
       <button class="btn btn-ghost" style="margin-top:16px;" onclick="router('editor')">Back to Editor</button>
     </div>
@@ -308,12 +362,15 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 /* ========= STATE ========= */
 const state = {
   screen:'landing',
+  title:'My Product Demo',
   source:{ type:null, url:null, imageData:null },
   hotspots:[],
   activeHotspot:null,
   currentStep:0,
   demoId:null,
   serverBase:(window.location.protocol+'//'+window.location.host),
+  zoom:1,
+  hintDismissed: localStorage.getItem('demoforge-hint-dismissed') === '1',
 };
 
 /* ========= ROUTER ========= */
@@ -323,39 +380,84 @@ function router(name) {
   const el=document.getElementById('screen-'+name);
   if(el)el.classList.add('active');
   document.getElementById('topbar').style.display=(name==='landing'||name==='capture')?'none':'flex';
-  if(name==='editor') renderSteps();
+  if(name==='editor') { renderSteps(); updateEditorTitle(); }
   if(name==='landing') resetState();
-  if(name==='share')  renderShare();
+  if(name==='share') renderShare();
 }
 function resetState(){
+  state.title='My Product Demo';
   state.source={type:null,url:null,imageData:null};
   state.hotspots=[]; state.activeHotspot=null; state.currentStep=0; state.demoId=null;
+  state.zoom=1;
   document.getElementById('editor-img').style.display='none';
   document.getElementById('editor-iframe').style.display='none';
   document.getElementById('editor-img').src='';
   document.getElementById('editor-iframe').src='about:blank';
   document.getElementById('editor-canvas').querySelectorAll('.hotspot').forEach(el=>el.remove());
+  document.getElementById('editor-canvas').style.width=''; document.getElementById('editor-canvas').style.height='';
   nextHotspotId=1;
   clearHotspotForms();
+  document.getElementById('demo-title-input').value='My Product Demo';
+  document.getElementById('url-input').value='';
+  document.getElementById('capture-error').classList.remove('show');
+  localStorage.removeItem('demoforge-draft');
 }
-function showToast(msg){
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function showToast(msg, actionText, actionFn){
+  const t=document.getElementById('toast');
+  t.innerHTML='';
+  const span=document.createElement('span'); span.textContent=msg; t.appendChild(span);
+  if(actionText && actionFn){
+    const btn=document.createElement('button'); btn.className='btn btn-sm btn-primary'; btn.textContent=actionText;
+    btn.onclick=function(){ actionFn(); t.classList.remove('show'); };
+    t.appendChild(btn);
+  }
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+function newDemoConfirm(){
+  if(state.hotspots.length>0 || state.source.type){
+    if(!confirm('Start a new demo? Your current work will be lost.')) return;
+  }
+  router('landing');
 }
 
 /* ========= CAPTURE ========= */
-function captureURL(){
+function isValidURL(str){
+  return /^https?:\/\/.+/i.test(str);
+}
+async function captureURL(){
   let url=document.getElementById('url-input').value.trim();
+  state.title=document.getElementById('demo-title-input').value.trim() || 'My Product Demo';
   if(!url){showToast('Please enter a website address.'); return;}
-  if(!/^https?:\/\//.test(url)){url='https://'+url;}
-  state.source={type:'url',url:url,imageData:null};
-  enterEditor();
+  if(!isValidURL(url)){url='https://'+url;}
+  if(!isValidURL(url)){showToast('That does not look like a valid web address.'); return;}
+
+  document.getElementById('capture-spinner').classList.remove('hidden');
+  document.getElementById('capture-error').classList.remove('show');
+  document.getElementById('capture-btn').disabled=true;
+
+  try{
+    const r=await fetch(state.serverBase+'/api/capture',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+    const data=await r.json();
+    if(!r.ok || data.error){
+      throw new Error(data.error || 'Screenshot failed');
+    }
+    state.source={type:'image',url:url,imageData:data.imageData};
+    enterEditor();
+  }catch(e){
+    document.getElementById('capture-error').classList.add('show');
+    document.getElementById('capture-error-msg').textContent=e.message || 'This site blocks screenshots. Upload a screenshot manually instead.';
+  }finally{
+    document.getElementById('capture-spinner').classList.add('hidden');
+    document.getElementById('capture-btn').disabled=false;
+  }
 }
 function handleFile(ev){
   const f=ev.target.files[0]; if(!f)return;
   const reader=new FileReader();
   reader.onload=function(e){
     state.source={type:'image',url:null,imageData:e.target.result};
+    state.title=document.getElementById('demo-title-input').value.trim() || 'My Product Demo';
     enterEditor();
   };
   reader.readAsDataURL(f);
@@ -366,7 +468,7 @@ dz.addEventListener('dragleave',e=>{e.preventDefault();dz.classList.remove('drag
 dz.addEventListener('drop',e=>{
   e.preventDefault();dz.classList.remove('dragover');
   const f=e.dataTransfer.files[0];
-  if(f){const r=new FileReader();r.onload=function(ev){state.source={type:'image',url:null,imageData:ev.target.result};enterEditor();};r.readAsDataURL(f);}
+  if(f){const r=new FileReader();r.onload=function(ev){state.source={type:'image',url:null,imageData:ev.target.result};state.title=document.getElementById('demo-title-input').value.trim() || 'My Product Demo';enterEditor();};r.readAsDataURL(f);}
 });
 
 function enterEditor(){
@@ -377,7 +479,11 @@ function enterEditor(){
   const overlay=document.getElementById('editor-overlay');
   if(state.source.type==='image'){
     img.src=state.source.imageData; img.style.display='block'; iframe.style.display='none';
-    img.onload=()=>{canvas.style.width=img.naturalWidth+'px'; canvas.style.height=img.naturalHeight+'px';};
+    img.onload=()=>{
+      canvas.style.width=img.naturalWidth+'px';
+      canvas.style.height=img.naturalHeight+'px';
+      setZoom(1);
+    };
     overlay.style.display='none';
   }else{
     iframe.src=state.source.url; iframe.style.display='block'; img.style.display='none';
@@ -386,7 +492,49 @@ function enterEditor(){
     overlay.style.display='block';
   }
   setupEditorClick();
+  if(!state.hintDismissed && state.hotspots.length===0){
+    document.getElementById('editor-hint').classList.remove('hidden');
+  }
 }
+
+/* ========= EDITOR ZOOM / PAN ========= */
+function setZoom(z){
+  state.zoom=Math.max(0.25,Math.min(3,z));
+  const canvas=document.getElementById('editor-canvas');
+  const img=document.getElementById('editor-img');
+  const iframe=document.getElementById('editor-iframe');
+  if(state.source.type==='image' && img.naturalWidth){
+    canvas.style.width=(img.naturalWidth*state.zoom)+'px';
+    canvas.style.height=(img.naturalHeight*state.zoom)+'px';
+  }else if(state.source.type==='url'){
+    canvas.style.width=(900*state.zoom)+'px';
+    canvas.style.height=(640*state.zoom)+'px';
+  }
+}
+const stageEl=document.getElementById('editor-stage');
+stageEl.addEventListener('wheel',function(e){
+  if(e.ctrlKey || e.metaKey){
+    e.preventDefault();
+    const delta=e.deltaY>0?0.9:1.1;
+    setZoom(state.zoom*delta);
+  }
+},{passive:false});
+
+let pinchStartDist=0, pinchStartZoom=1;
+stageEl.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){
+    pinchStartDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    pinchStartZoom=state.zoom;
+  }
+},{passive:true});
+stageEl.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    e.preventDefault();
+    const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    const ratio=dist/pinchStartDist;
+    setZoom(pinchStartZoom*ratio);
+  }
+},{passive:false});
 
 /* ========= EDITOR ========= */
 let nextHotspotId=1;
@@ -417,6 +565,8 @@ function addHotspot(x,y,pctX,pctY){
   renderHotspot(hotspot);
   renderSteps();
   setTimeout(()=>openInlineEditor(id),10);
+  dismissHint();
+  autosave();
 }
 function renderHotspot(h){
   const canvas=document.getElementById('editor-canvas');
@@ -452,27 +602,40 @@ function clearHotspotForms(){
 function saveHotspot(id){
   const ta=document.getElementById('hs-text-'+id);
   const h=state.hotspots.find(x=>x.id===id); if(h && ta){h.text=ta.value;}
-  clearHotspotForms(); renderSteps(); showToast('Step saved.');
+  clearHotspotForms(); renderSteps(); showToast('Step saved.'); autosave();
 }
 function deleteHotspot(id){
   state.hotspots=state.hotspots.filter(x=>x.id!==id);
   const el=document.getElementById('hs-'+id); if(el)el.remove();
-  clearHotspotForms(); renderSteps();
+  clearHotspotForms();
+  renumberHotspots();
+  renderSteps();
+  autosave();
+}
+function renumberHotspots(){
+  state.hotspots.forEach((h,i)=>{ h.id=i+1; });
+  nextHotspotId=state.hotspots.length+1;
+  const canvas=document.getElementById('editor-canvas');
+  canvas.querySelectorAll('.hotspot').forEach(el=>el.remove());
+  state.hotspots.forEach(h=>renderHotspot(h));
 }
 function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
 
+function updateEditorTitle(){
+  document.getElementById('demo-title').textContent=state.title || 'Demo Steps';
+}
 function renderSteps(){
   const list=document.getElementById('steps-list');
   if(state.hotspots.length===0){
     list.innerHTML='<div style="text-align:center;color:var(--text-faint);padding:40px 20px;"><p style="font-size:28px;margin-bottom:10px;">&#128204;</p><p>Click anywhere on the screen to add your first hotspot.</p></div>';
-    document.getElementById('demo-title').textContent='Demo Steps';
+    document.getElementById('demo-title').textContent=state.title || 'Demo Steps';
     return;
   }
   list.innerHTML=state.hotspots.map((h,i)=>'<div class="step-item '+(state.activeHotspot===h.id?'active':'')+'" onclick="highlightStep('+h.id+')">'+
     '<span class="step-num">'+(i+1)+'</span><span class="step-text">'+escapeHtml(h.text)+'</span>'+
-    '<div class="step-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
+    '<div class="step-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-ghost" style="color:var(--danger)" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
     '</div>').join('');
-  document.getElementById('demo-title').textContent=state.hotspots.length+' Step'+(state.hotspots.length===1?'':'s');
+  document.getElementById('demo-title').textContent=state.title || 'Demo Steps';
 }
 function highlightStep(id){
   state.activeHotspot=id;
@@ -483,18 +646,53 @@ function highlightStep(id){
 function moveHotspot(idx,dir){
   const nIdx=idx+dir; if(nIdx<0||nIdx>=state.hotspots.length)return;
   const tmp=state.hotspots[idx]; state.hotspots[idx]=state.hotspots[nIdx]; state.hotspots[nIdx]=tmp;
-  renderSteps();
+  renderSteps(); autosave();
+}
+function dismissHint(){
+  state.hintDismissed=true;
+  localStorage.setItem('demoforge-hint-dismissed','1');
+  document.getElementById('editor-hint').classList.add('hidden');
+}
+
+/* ========= AUTOSAVE ========= */
+function autosave(){
+  const payload={title:state.title,source:state.source,hotspots:state.hotspots};
+  localStorage.setItem('demoforge-draft',JSON.stringify(payload));
+}
+function loadDraft(){
+  const raw=localStorage.getItem('demoforge-draft');
+  if(!raw) return;
+  try{
+    const draft=JSON.parse(raw);
+    if(draft.source && (draft.source.imageData || draft.source.url) && draft.hotspots){
+      showToast('Resume your last demo?','Resume',function(){
+        state.title=draft.title || 'My Product Demo';
+        state.source=draft.source;
+        state.hotspots=(draft.hotspots||[]).map((h,i)=>({id:i+1,pctX:h.pctX,pctY:h.pctY,text:h.text}));
+        nextHotspotId=state.hotspots.length+1;
+        enterEditor();
+        setTimeout(()=>{
+          state.hotspots.forEach(h=>renderHotspot(h));
+          renderSteps();
+        },50);
+      });
+    }
+  }catch(e){ console.error('Bad draft',e); }
 }
 
 /* ========= PLAYER ========= */
 function previewDemo(){ playFromStep(0); }
 function playSample(){
-  state.source={type:'url',url:'https://example.com',imageData:null};
+  const svg='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="70"/><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="30" y="44">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="18" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="40">Book Now</text><rect fill="#1e293b" x="60" y="110" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="160">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="200">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="240" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="268">Get a Free Quote</text><rect fill="#1e293b" x="580" y="110" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="150">Customer Reviews</text><rect fill="#334155" x="610" y="180" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="210">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="230">"professional. No more ants!"</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="250">- Sarah J.</text><rect fill="#334155" x="610" y="280" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="340">- Mike R.</text><rect fill="#334155" x="610" y="380" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="410">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="440">- Linda K.</text><rect fill="#1e293b" x="60" y="360" width="480" height="190" rx="10"/><text fill="#e5e7eb" font-size="20" font-family="sans-serif" x="90" y="410">Our Services</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="445">Residential pest control</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="470">Commercial inspections</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="495">Emergency same-day visits</text></svg>');
+  state.source={type:'image',url:null,imageData:svg};
+  state.title="Mike's Pest Control Demo";
   state.hotspots=[
-    {id:1,pctX:.25,pctY:.35,text:'Your customers land here and immediately see what you offer. No confusion, no clicks to dig.'},
-    {id:2,pctX:.55,pctY:.22,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
-    {id:3,pctX:.72,pctY:.62,text:'Your reviews front and center. Social proof sells while you sleep.'},
+    {id:1,pctX:.45,pctY:.08,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
+    {id:2,pctX:.88,pctY:.06,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
+    {id:3,pctX:.22,pctY:.37,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
+    {id:4,pctX:.78,pctY:.30,text:'Reviews front and center. Social proof sells while you sleep.'},
   ];
+  nextHotspotId=5;
   playFromStep(0);
 }
 function playFromStep(idx){
@@ -506,10 +704,13 @@ function playFromStep(idx){
   const stage=document.getElementById('player-stage');
   if(state.source.type==='image'){
     img.src=state.source.imageData; img.style.display='block'; iframe.style.display='none';
-    img.onload=()=>{ stage.style.width=img.naturalWidth+'px'; stage.style.height=img.naturalHeight+'px'; };
+    img.style.maxWidth='100%'; img.style.height='auto';
+    stage.style.width='auto'; stage.style.height='auto';
+    img.onload=function(){ renderPlayerStep(); };
   }else{
     iframe.src=state.source.url; iframe.style.display='block'; img.style.display='none';
     stage.style.width='900px'; stage.style.height='640px';
+    iframe.onload=renderPlayerStep;
   }
   renderPlayerStep();
 }
@@ -522,10 +723,19 @@ function renderPlayerStep(){
   const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
   spot.style.left=(sx-60)+'px'; spot.style.top=(sy-60)+'px';
   let bx=sx+80, by=sy;
-  if(bx+320>stage.offsetWidth){bx=sx-340;}
-  if(by+120>stage.offsetHeight){by=stage.offsetHeight-130;}
-  if(by<10){by=10;}
   bubble.style.left=bx+'px'; bubble.style.top=by+'px';
+  // Clamp bubble to viewport
+  requestAnimationFrame(function(){
+    const vpW=window.innerWidth, vpH=window.innerHeight;
+    const sRect=stage.getBoundingClientRect();
+    let viewBx=sRect.left+bx, viewBy=sRect.top+by;
+    if(viewBx+bubble.offsetWidth>vpW-10) viewBx=vpW-bubble.offsetWidth-10;
+    if(viewBx<10) viewBx=10;
+    if(viewBy+bubble.offsetHeight>vpH-10) viewBy=vpH-bubble.offsetHeight-10;
+    if(viewBy<10) viewBy=10;
+    bubble.style.left=(viewBx-sRect.left)+'px';
+    bubble.style.top=(viewBy-sRect.top)+'px';
+  });
   document.getElementById('bubble-step').textContent='Step '+(state.currentStep+1)+' of '+state.hotspots.length;
   document.getElementById('bubble-text').textContent=h.text;
   const pct=((state.currentStep+1)/state.hotspots.length)*100;
@@ -536,27 +746,10 @@ function prevStep(){ if(state.currentStep>0){state.currentStep--; renderPlayerSt
 function exitPlayer(){ router('editor'); }
 
 /* ========= QR & SHARE ========= */
-function drawQR(canvas,text,size){
-  const ctx=canvas.getContext('2d');
-  const cell=size/25;
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,size,size);
-  ctx.fillStyle='#000';
-  let idx=0;
-  for(let r=0;r<25;r++){
-    for(let c=0;c<25;c++){
-      if(c<7 && r<7){ if(c===0||c===6||r===0||r===6||((c>=2&&c<=4)&&(r>=2&&r<=4))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
-      if(c>=18 && r<7){ if(c===18||c===24||r===0||r===6||((c>=20&&c<=22)&&(r>=2&&r<=4))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
-      if(c<7 && r>=18){ if(c===0||c===6||r===18||r===24||((c>=2&&c<=4)&&(r>=20&&r<=22))) ctx.fillRect(c*cell,r*cell,cell,cell); continue; }
-      idx=(idx+1)%text.length;
-      if((text.charCodeAt(idx)+r+c)%2) ctx.fillRect(c*cell,r*cell,cell,cell);
-    }
-  }
-}
-
 async function publishDemo(){
   if(state.hotspots.length===0){showToast('Add at least one step before sharing.'); return;}
   const payload={
-    title:'My Demo',
+    title:state.title || 'My Demo',
     source: state.source,
     hotspots: state.hotspots.map(h=>({pctX:h.pctX,pctY:h.pctY,text:h.text}))
   };
@@ -565,30 +758,49 @@ async function publishDemo(){
     if(!r.ok)throw new Error('Server error');
     const data=await r.json();
     state.demoId=data.id;
+    localStorage.removeItem('demoforge-draft');
     router('share');
   }catch(e){
     const hash=btoa(encodeURIComponent(JSON.stringify(payload))).slice(0,60);
     state.demoId='local_'+hash;
+    localStorage.removeItem('demoforge-draft');
     router('share');
   }
 }
 function renderShare(){
   let url;
   if(state.demoId && state.demoId.startsWith('local_')){
-    const payload={source:state.source,hotspots:state.hotspots};
+    const payload={source:state.source,hotspots:state.hotspots,title:state.title};
     const hash=btoa(encodeURIComponent(JSON.stringify(payload)));
     url=window.location.origin+window.location.pathname+'#play='+hash;
   }else{
     url=state.serverBase+'/play/'+state.demoId;
   }
+  document.getElementById('share-title').textContent="Your '"+(state.title || 'My Demo')+"' demo is live.";
   document.getElementById('share-input').value=url;
   document.getElementById('embed-code').textContent='<iframe src="'+url+'" width="100%" height="600" frameborder="0"></iframe>';
-  const cvs=document.getElementById('qr-canvas');
-  if(cvs) drawQR(cvs,url,140);
+  const box=document.getElementById('qr-box');
+  box.innerHTML='';
+  if(typeof QRCode !== 'undefined'){
+    new QRCode(box,{text:url,width:140,height:140,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }else{
+    box.innerHTML='<p style="color:#333;font-size:12px;">QR library loading...</p>';
+  }
 }
 function copyShare(){
   const el=document.getElementById('share-input'); el.select();
   navigator.clipboard.writeText(el.value).then(()=>showToast('Link copied!'));
+}
+function copyLinkPlain(){
+  const el=document.getElementById('share-input');
+  navigator.clipboard.writeText(el.value).then(()=>showToast('Link copied to clipboard!'));
+}
+function showEmbedCode(){
+  const box=document.getElementById('embed-code');
+  box.classList.toggle('show');
+  if(box.classList.contains('show')){
+    navigator.clipboard.writeText(box.textContent).then(()=>showToast('Embed code copied!'));
+  }
 }
 
 /* ========= HASH PLAYBACK ========= */
@@ -598,12 +810,16 @@ function handleHash(){
     try{
       const payload=JSON.parse(decodeURIComponent(atob(hash.slice(6))));
       state.source=payload.source;
+      state.title=payload.title || 'My Demo';
       state.hotspots=(payload.hotspots||[]).map((h,i)=>({id:i+1,...h}));
+      nextHotspotId=state.hotspots.length+1;
       playFromStep(0);
       return;
     }catch(e){ console.error('Bad hash',e); }
   }
   router('landing');
+  // After landing, check draft
+  setTimeout(loadDraft,600);
 }
 window.addEventListener('hashchange',handleHash);
 handleHash();
