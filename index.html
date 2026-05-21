@@ -543,8 +543,17 @@ function setupEditorClick(){
   const canvas=document.getElementById('editor-canvas');
   overlay.onclick=null;
   canvas.onclick=null;
-  const handler=function(e){
-    // Only add hotspot if clicking the canvas/overlay itself, not a child element (hotspot, form, button)
+
+  // Use pointerdown/move/up to distinguish click vs drag
+  let dragStartX=0, dragStartY=0, didDrag=false;
+  const onDown=function(e){
+    dragStartX=e.clientX; dragStartY=e.clientY; didDrag=false;
+  };
+  const onMove=function(e){
+    if(Math.abs(e.clientX-dragStartX)>4 || Math.abs(e.clientY-dragStartY)>4) didDrag=true;
+  };
+  const onUp=function(e){
+    if(didDrag) return;
     if(e.target!==canvas && e.target!==overlay) return;
     const rect=canvas.getBoundingClientRect();
     const x=e.clientX-rect.left;
@@ -553,10 +562,15 @@ function setupEditorClick(){
     const pctY=(y/rect.height);
     addHotspot(x,y,pctX,pctY);
   };
+
   if(state.source.type==='url'){
-    overlay.onclick=handler;
+    overlay.addEventListener('pointerdown',onDown);
+    overlay.addEventListener('pointermove',onMove);
+    overlay.addEventListener('pointerup',onUp);
   }else{
-    canvas.onclick=handler;
+    canvas.addEventListener('pointerdown',onDown);
+    canvas.addEventListener('pointermove',onMove);
+    canvas.addEventListener('pointerup',onUp);
   }
 }
 function addHotspot(x,y,pctX,pctY){
@@ -590,14 +604,15 @@ function openInlineEditor(id){
   form.id='inline-editor';
   const px=h.pctX*canvas.offsetWidth, py=h.pctY*canvas.offsetHeight;
   let fx=px+20, fy=py-20;
-  if(fx+280>canvas.offsetWidth) fx=px-300;
-  if(fy+140>canvas.offsetHeight) fy=py-140;
-  if(fy<0) fy=10;
+  // Clamp to canvas bounds so form never leaves the image
+  if(fx+280>canvas.offsetWidth) fx=canvas.offsetWidth-300;
+  if(fx<10) fx=10;
+  if(fy+160>canvas.offsetHeight) fy=canvas.offsetHeight-170;
+  if(fy<10) fy=10;
   form.style.left=fx+'px'; form.style.top=fy+'px';
   const taValue=h.isNew?'':escapeHtml(h.text);
   form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
   canvas.appendChild(form);
-  // Stop clicks inside the form from bubbling to the canvas
   form.onclick=function(e){e.stopPropagation();};
   document.getElementById('hs-text-'+id).focus();
 }
