@@ -742,16 +742,21 @@ function renderPlayerStep(){
   if(!h){ exitPlayer(); return; }
   const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
   spot.style.left=(sx-60)+'px'; spot.style.top=(sy-60)+'px';
-  let bx=sx+80, by=sy;
-  bubble.style.left=bx+'px'; bubble.style.top=by+'px';
-  // Clamp bubble to viewport
+  // Reset bubble to measure, then smart-position inside rAF
+  bubble.style.left='0px'; bubble.style.top='0px';
   requestAnimationFrame(function(){
     const vpW=window.innerWidth, vpH=window.innerHeight;
     const sRect=stage.getBoundingClientRect();
+    const bW=bubble.offsetWidth||280, bH=bubble.offsetHeight||120;
+    // Smart placement: right by default, left if near right edge; below by default, above if near bottom
+    let bx=sx+80, by=sy-20;
+    if(sy + bH + 20 > stage.offsetHeight) by = sy - bH - 20;
+    if(sx + bW + 80 > stage.offsetWidth) bx = sx - bW - 80;
+    // Clamp to viewport
     let viewBx=sRect.left+bx, viewBy=sRect.top+by;
-    if(viewBx+bubble.offsetWidth>vpW-10) viewBx=vpW-bubble.offsetWidth-10;
+    if(viewBx+bW>vpW-10) viewBx=vpW-bW-10;
     if(viewBx<10) viewBx=10;
-    if(viewBy+bubble.offsetHeight>vpH-10) viewBy=vpH-bubble.offsetHeight-10;
+    if(viewBy+bH>vpH-10) viewBy=vpH-bH-10;
     if(viewBy<10) viewBy=10;
     bubble.style.left=(viewBx-sRect.left)+'px';
     bubble.style.top=(viewBy-sRect.top)+'px';
