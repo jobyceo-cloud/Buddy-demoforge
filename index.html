@@ -107,8 +107,8 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .editor-body { display:flex; flex:1; overflow:hidden; }
 .editor-stage { flex:1; position:relative; background:#000; display:flex; align-items:flex-start; justify-content:flex-start; overflow:auto; padding:24px; cursor:grab; }
 .editor-stage:active { cursor:grabbing; }
-.editor-canvas { position:relative; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; transform-origin:0 0; flex-shrink:0; }
-.editor-canvas iframe, .editor-canvas img { display:block; border:none; max-width:100%; pointer-events:none; user-select:none; }
+.editor-canvas { position:relative; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); transform-origin:0 0; flex-shrink:0; }
+.editor-canvas iframe, .editor-canvas img { display:block; border:none; max-width:100%; pointer-events:none; user-select:none; border-radius:var(--radius); }
 .hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; cursor:pointer; animation:pulse 2s infinite; transform:translate(-50%,-50%); box-shadow:0 0 12px var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; z-index:5; }
 .hotspot.active { background:var(--warn); box-shadow:0 0 12px var(--warn); }
 .hotspot-editor-form { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); padding:14px; width:280px; z-index:20; box-shadow:var(--shadow); }
@@ -622,6 +622,7 @@ function openInlineEditor(id){
   form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
   canvas.appendChild(form);
   form.onclick=function(e){e.stopPropagation();};
+  form.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
   document.getElementById('hs-text-'+id).focus();
 }
 function clearHotspotForms(){
@@ -660,8 +661,8 @@ function renderSteps(){
     return;
   }
   list.innerHTML=state.hotspots.map((h,i)=>'<div class="step-item '+(state.activeHotspot===h.id?'active':'')+'" onclick="highlightStep('+h.id+')">'+
-    '<span class="step-num">'+(i+1)+'</span><textarea class="step-text" rows="2" onblur="saveStepText('+h.id+',this.value)" onclick="event.stopPropagation();">'+escapeHtml(h.text)+'</textarea>'+
-    '<div class="step-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-ghost" style="color:var(--danger)" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
+    '<span class="step-num">'+(i+1)+'</span><textarea class="step-text" rows="2" id="side-text-'+h.id+'" onblur="saveStepText('+h.id+',this.value)" onclick="event.stopPropagation();">'+escapeHtml(h.text)+'</textarea>'+
+    '<div class="step-actions"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveStepText('+h.id+',document.getElementById(\'side-text-'+h.id+'\').value);this.textContent=\'Saved\';setTimeout(()=>this.textContent=\'Save\',1200)">Save</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-ghost" style="color:var(--danger)" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
     '</div>').join('');
   document.getElementById('demo-title').textContent=state.title || 'Demo Steps';
 }
