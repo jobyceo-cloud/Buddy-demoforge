@@ -1019,7 +1019,7 @@ function showEmbedCode(){
 /* ========= INLINE DEMO PLAYER ========= */
 let demoState={idx:0,hotspots:[],playing:false,timer:null};
 function getSampleSVG(){
-  return 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="70"/><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="30" y="44">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="18" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="40">Book Now</text><rect fill="#1e293b" x="60" y="110" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="160">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="200">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="240" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="268">Get a Free Quote</text><rect fill="#1e293b" x="580" y="110" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="150">Customer Reviews</text><rect fill="#334155" x="610" y="180" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="210">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="230">"professional. No more ants!"</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="250">- Sarah J.</text><rect fill="#334155" x="610" y="280" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="340">- Mike R.</text><rect fill="#334155" x="610" y="380" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="410">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="430">- Jen D.</text></svg>');
+  return 'data:image/svg+xml;utf8,encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="160"/><path fill="#22d3ee" d="M44,90 L58,90 L62,98 L62,112 L58,120 L44,120 L40,112 L40,98 Z"/><text fill="#0f172a" font-size="16" font-weight="bold" font-family="sans-serif" text-anchor="middle" x="51" y="111">P</text><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="72" y="115">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="88" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="108">Book Now</text><rect fill="#1e293b" x="60" y="190" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="240">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="280">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="320" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="348">Get a Free Quote</text><rect fill="#1e293b" x="580" y="190" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="230">Customer Reviews</text><rect fill="#334155" x="610" y="260" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="290">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">professional. No more ants!</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="330">- Sarah J.</text><rect fill="#334155" x="610" y="360" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="390">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="410">- Mike R.</text><rect fill="#334155" x="610" y="460" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="490">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="510">- Jen D.</text></svg>');
 }
 function startInlineDemo(){
   const img=document.getElementById('demo-img');
@@ -1027,10 +1027,10 @@ function startInlineDemo(){
   if(!img||!stage)return;
   img.src=getSampleSVG(); img.style.display='block';
   demoState.hotspots=[
-    {pctX:.45,pctY:.08,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
-    {pctX:.88,pctY:.06,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
-    {pctX:.22,pctY:.37,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
-    {pctX:.78,pctY:.30,text:'Reviews front and center. Social proof sells while you sleep.'}
+    {pctX:.111,pctY:.172,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
+    {pctX:.883,pctY:.164,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
+    {pctX:.189,pctY:.534,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
+    {pctX:.75,pctY:.352,text:'Reviews front and center. Social proof sells while you sleep.'}
   ];
   demoState.idx=0; demoState.playing=true;
   img.onload=function(){setTimeout(renderDemoStep,50);};
@@ -1044,13 +1044,43 @@ function renderDemoStep(){
   const img=document.getElementById('demo-img');
   if(!h||!spot||!bubble||!stage||!img)return;
   if(!img.complete||img.naturalWidth===0){setTimeout(renderDemoStep,50);return;}
+
   const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
-  spot.style.left=(sx-50)+'px'; spot.style.top=(sy-50)+'px'; spot.classList.add('active');
+  const SPOT_R=50; // spotlight radius (100x100 circle)
+  const PAD=20;    // padding between spotlight and bubble
+
+  // Position spotlight centered on hotspot
+  spot.style.left=(sx-SPOT_R)+'px'; spot.style.top=(sy-SPOT_R)+'px'; spot.classList.add('active');
   document.getElementById('demo-bubble-step').textContent='Step '+(demoState.idx+1)+' of '+demoState.hotspots.length;
   document.getElementById('demo-bubble-text').textContent=h.text;
-  let bx=sx+70, by=sy-20;
-  if(sy+120>stage.offsetHeight)by=sy-120;
-  if(sx+280+70>stage.offsetWidth)bx=sx-290;
+
+  // Measure bubble
+  bubble.style.left='0px'; bubble.style.top='0px'; bubble.style.opacity='0';
+  const bW=bubble.offsetWidth||260, bH=bubble.offsetHeight||100;
+  bubble.style.opacity='';
+
+  // Try right side first
+  let bx=sx+SPOT_R+PAD, by=sy-bH/2;
+  // If right side would go off stage, flip to left
+  if(bx+bW>stage.offsetWidth-10){ bx=sx-SPOT_R-PAD-bW; }
+  // If left side would go off stage, force right and clamp
+  if(bx<10){ bx=Math.min(stage.offsetWidth-bW-10, sx+SPOT_R+PAD); }
+  // Vertical clamp
+  if(by<10)by=10;
+  if(by+bH>stage.offsetHeight-10)by=stage.offsetHeight-bH-10;
+
+  // Double-check no overlap with spotlight
+  const spotLeft=sx-SPOT_R, spotRight=sx+SPOT_R, spotTop=sy-SPOT_R, spotBottom=sy+SPOT_R;
+  const bubLeft=bx, bubRight=bx+bW, bubTop=by, bubBottom=by+bH;
+  if(bubRight>spotLeft && bubLeft<spotRight && bubBottom>spotTop && bubTop<spotBottom){
+    // Overlaps — nudge above or below
+    if(sy+bH+SPOT_R+PAD<stage.offsetHeight-10){
+      by=sy+SPOT_R+PAD; // place below
+    }else{
+      by=Math.max(10, sy-SPOT_R-PAD-bH); // place above
+    }
+  }
+
   bubble.style.left=bx+'px'; bubble.style.top=by+'px'; bubble.classList.add('active');
   const pct=((demoState.idx+1)/demoState.hotspots.length)*100;
   document.getElementById('demo-progress-bar').style.width=pct+'%';
