@@ -80,26 +80,26 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .social-proof .stat { font-weight:600; color:var(--text); }
 .social-proof .trust { font-weight:500; }
 
-.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:var(--surface); border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.08); position:relative; overflow:hidden; }
-.mock-chrome { height:32px; background:#1e293b; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.06); }
+.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; overflow:hidden; }
+.mock-chrome { height:32px; background:#111827; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.08); }
 .mock-dots { display:flex; gap:6px; }
 .mock-dots span { width:10px; height:10px; border-radius:50%; background:#475569; display:block; }
-.mock-url { flex:1; background:#0f172a; border-radius:4px; height:20px; font-size:11px; color:#64748b; display:flex; align-items:center; padding:0 10px; max-width:240px; }
-.mock-body { padding:24px; display:flex; gap:24px; height:calc(100% - 32px); }
-.mock-left { flex:1; display:flex; flex-direction:column; gap:12px; padding-top:16px; }
-.mock-logo { width:70px; height:14px; background:rgba(255,255,255,.08); border-radius:4px; }
-.mock-headline { width:70%; height:22px; background:rgba(255,255,255,.12); border-radius:4px; margin-top:8px; }
-.mock-sub { width:60%; height:14px; background:rgba(255,255,255,.06); border-radius:4px; }
-.mock-btn { width:120px; height:36px; background:var(--accent); border-radius:8px; margin-top:12px; opacity:.8; }
-.mock-right { width:180px; }
-.mock-card { background:#1e293b; border-radius:10px; padding:16px; }
-.mock-stars { color:#f59e0b; font-size:14px; letter-spacing:2px; }
-.mock-review { color:var(--text-dim); font-size:12px; margin-top:8px; }
-.mock-hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 12px var(--accent); animation:pulse 2s infinite; transform:translate(-50%,-50%); cursor:pointer; }
-.mock-hotspot:hover { transform:translate(-50%,-50%) scale(1.1); }
-.mock-bubble { position:absolute; left: calc(78% + 18px); top: 6%; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; width:200px; box-shadow:var(--shadow); z-index:5; }
-.mock-bubble::before { content:""; position:absolute; left:-6px; top:18px; width:12px; height:12px; background:var(--surface-2); border-left:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); transform:rotate(45deg); }
-.mock-bubble h5 { font-size:12px; color:var(--accent-2); margin-bottom:4px; font-weight:700; }
+.mock-url { flex:1; background:#0f172a; border-radius:4px; height:20px; font-size:11px; color:#64748b; display:flex; align-items:center; padding:0 10px; max-width:240px; border:1px solid rgba(255,255,255,.06); }
+.mock-body { padding:20px; display:flex; gap:20px; height:calc(100% - 32px); background:#0f172a; }
+.mock-left { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:12px; }
+.mock-logo { width:70px; height:14px; background:rgba(255,255,255,.25); border-radius:4px; }
+.mock-headline { width:75%; height:20px; background:rgba(255,255,255,.35); border-radius:4px; margin-top:6px; }
+.mock-sub { width:55%; height:14px; background:rgba(255,255,255,.18); border-radius:4px; }
+.mock-btn { width:120px; height:34px; background:var(--accent); border-radius:8px; margin-top:10px; opacity:.85; }
+.mock-right { width:170px; }
+.mock-card { background:#1e293b; border-radius:10px; padding:14px; border:1px solid rgba(255,255,255,.08); }
+.mock-stars { color:#f59e0b; font-size:13px; letter-spacing:2px; }
+.mock-review { color:#94a3b8; font-size:11px; margin-top:6px; line-height:1.4; }
+.mock-hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; transform:translate(-50%,-50%); cursor:pointer; z-index:10; }
+.mock-hotspot:hover { transform:translate(-50%,-50%) scale(1.12); }
+.mock-bubble { position:absolute; left: calc(30% + 32px); top: 16%; background:var(--surface-2); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:12px 14px; width:240px; box-shadow:var(--shadow); z-index:5; box-sizing:border-box; }
+.mock-bubble::before { content:""; position:absolute; left:-6px; top:14px; width:12px; height:12px; background:var(--surface-2); border-left:1px solid rgba(255,255,255,.15); border-bottom:1px solid rgba(255,255,255,.15); transform:rotate(45deg); }
+.mock-bubble h5 { font-size:13px; color:var(--accent-2); margin-bottom:4px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .mock-bubble p { font-size:12px; color:var(--text-dim); line-height:1.4; }
 
 .section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
@@ -129,8 +129,8 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 @media (max-width:700px) {
   .hiw-steps { grid-template-columns:1fr; }
   .mock-right { display:none; }
-  .mock-bubble { width:160px; padding:10px 12px; left:auto; right:4%; top:4%; }
-  .mock-bubble::before { left:auto; right:18px; bottom:-6px; top:auto; transform:rotate(225deg); }
+  .mock-bubble { width:200px; padding:10px 12px; left: calc(20% + 28px); top: 10%; }
+  .mock-bubble::before { left:-6px; top:12px; }
 }
 @media (max-width:600px) {
   .landing-hero { padding:48px 20px 64px; }
@@ -211,10 +211,14 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .player-bubble { position:absolute; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-lg); padding:18px 20px; max-width:300px; box-shadow:var(--shadow); transition:all .4s ease; z-index:10; }
 .player-bubble h4 { font-size:14px; margin-bottom:6px; color:var(--accent-2); }
 .player-bubble p { font-size:13px; line-height:1.45; color:var(--text); word-break:break-word; overflow-wrap:break-word; }
-.player-controls { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:600px; margin-top:20px; padding:0 10px; }
+.player-controls { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:600px; margin-top:20px; padding:0 10px; position:relative; z-index:20; }
 .player-progress { flex:1; height:4px; background:rgba(255,255,255,.1); border-radius:2px; margin:0 20px; overflow:hidden; }
 .player-progress-bar { height:100%; background:var(--accent); transition:width .5s ease; }
 .player-nav-btns { display:flex; gap:10px; }
+
+/* clamped share / capture cards */
+.share-card, .capture-card { width:100%; max-width:480px; margin:0 auto; }
+@media (max-width:520px){ .share-card, .capture-card { max-width:calc(100vw - 48px); } }
 
 /* ============================================================
    SHARE SCREEN
@@ -320,7 +324,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           </div>
         </div>
       </div>
-      <div class="mock-hotspot" style="left:78%;top:28%;">1</div>
+      <div class="mock-hotspot" style="left:30%;top:18%;">1</div>
       <div class="mock-bubble">
         <h5>Social Proof Sells</h5>
         <p>Reviews are the first thing your customer trusts. Put them above the fold.</p>
@@ -727,19 +731,17 @@ function openInlineEditor(id){
   form.id='inline-editor';
   const px=h.pctX*canvas.offsetWidth, py=h.pctY*canvas.offsetHeight;
   const FORM_W=300, FORM_H=200;
-  let fx=px+20, fy=py-20;
-  // If pin is in bottom half, show form ABOVE the pin
-  if (py > canvas.offsetHeight * 0.5) {
-    fy = py - FORM_H - 20;
-  }
-  // Clamp right edge only -- sidebar is the hard boundary
+  let fx=px+22, fy=py-20;
+  if (py > canvas.offsetHeight * 0.5) { fy = py - FORM_H - 22; }
   const stageRect = stage.getBoundingClientRect();
-  const maxFx = Math.min(stage.scrollLeft + stage.clientWidth - FORM_W, window.innerWidth - stageRect.left - FORM_W - 10);
+  const maxFx = stage.scrollLeft + stage.clientWidth - FORM_W - 10;
   const minFx = stage.scrollLeft + 10;
   if(fx > maxFx) fx = maxFx;
   if(fx < minFx) fx = minFx;
-  // Do NOT clamp bottom -- let form extend and scroll it into view
-  if(fy < stage.scrollTop + 10) fy = stage.scrollTop + 10;
+  const maxFy = stage.scrollTop + stage.clientHeight - FORM_H - 10;
+  const minFy = stage.scrollTop + 10;
+  if(fy > maxFy) fy = maxFy;
+  if(fy < minFy) fy = minFy;
   form.style.left=fx+'px'; form.style.top=fy+'px';
   const taValue=h.isNew?'':escapeHtml(h.text);
   form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
