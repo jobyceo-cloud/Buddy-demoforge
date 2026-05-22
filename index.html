@@ -98,6 +98,44 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .mock-hotspot { position:absolute; left:auto; right:8px; top:auto; bottom:6px; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; cursor:pointer; z-index:10; }
 .mock-hotspot:hover { transform:scale(1.12); }
 
+
+/* Hero mini guided tour */
+.hero-spotlight{position:absolute;width:80px;height:80px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.72);pointer-events:none;transition:all .6s cubic-bezier(.22,1,.36,1);opacity:0;z-index:20;}
+.hero-spotlight.active{opacity:1;}
+.hero-spotlight::after{content:"";position:absolute;inset:-4px;border:2px solid var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+.hero-bubble{position:absolute;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-lg);padding:12px 14px;max-width:220px;box-shadow:var(--shadow);transition:all .4s ease;opacity:0;transform:translateY(6px);z-index:21;pointer-events:none;font-size:12px;line-height:1.4;color:var(--text);}
+.hero-bubble.active{opacity:1;transform:translateY(0);}
+.hero-bubble strong{color:var(--accent-2);display:block;margin-bottom:4px;font-size:13px;}
+
+/* Inline demo showcase */
+.demo-showcase{max-width:800px;margin:80px auto 0;padding:0 12px;text-align:center;}
+.demo-showcase h2{font-size:26px;font-weight:700;margin-bottom:8px;}
+.demo-showcase>p{color:var(--text-dim);font-size:15px;margin-bottom:24px;}
+.demo-stage-wrap{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:24px;position:relative;}
+.demo-stage{position:relative;max-width:100%;background:var(--surface-2);border-radius:var(--radius);overflow:hidden;margin:0 auto;}
+.demo-stage img{display:block;width:100%;height:auto;}
+.demo-spotlight{position:absolute;width:100px;height:100px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.82);pointer-events:none;transition:all .6s cubic-bezier(.22,1,.36,1);opacity:0;}
+.demo-spotlight.active{opacity:1;}
+.demo-spotlight::after{content:"";position:absolute;inset:-6px;border:2px solid var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+.demo-bubble{position:absolute;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-lg);padding:16px 18px;max-width:260px;box-shadow:var(--shadow);transition:all .4s ease;opacity:0;z-index:10;}
+.demo-bubble.active{opacity:1;}
+.demo-bubble h4{font-size:14px;margin-bottom:6px;color:var(--accent-2);}
+.demo-bubble p{font-size:13px;line-height:1.45;color:var(--text);}
+.demo-controls{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:16px;}
+.demo-progress{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px;max-width:200px;overflow:hidden;}
+.demo-progress-bar{height:100%;background:var(--accent);transition:width .5s ease;width:0%;}
+
+/* Feature card interactivity */
+.feature-card{cursor:pointer;}
+.feature-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease,margin .3s ease;opacity:0;}
+.feature-card.expanded .feature-detail{max-height:140px;opacity:1;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
+.feature-detail p{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px;}
+.feature-detail .btn-sm{margin-top:4px;}
+
+/* Draft resume nav */
+.nav-resume{display:none;font-size:13px;color:var(--accent-2);font-weight:600;cursor:pointer;margin-left:12px;}
+.nav-resume.show{display:inline-block;}
+
 .section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
 .landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:0 auto; padding:0 12px 80px; }
 .feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; transition:.15s; }
@@ -276,6 +314,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
     <span class="brand-title">DemoForge</span>
   </div>
   <div class="topbar-actions">
+    <span class="nav-resume" id="nav-resume" onclick="resumeFromNav()">&#8634; Resume Demo</span>
     <button class="btn btn-ghost" onclick="newDemoConfirm()">New Demo</button>
   </div>
 </div>
@@ -315,9 +354,33 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           <div class="mock-card">
             <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
             <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
-            <div class="mock-hotspot" onclick="toggleHiW()">1</div>
+            <div class="mock-hotspot" onclick="playHeroTour()">1</div>
           </div>
         </div>
+      </div>
+      <div class="hero-spotlight" id="hero-spotlight"></div>
+      <div class="hero-bubble" id="hero-bubble"><strong>Step 1</strong><span id="hero-bubble-text">Welcome to your guided tour.</span></div>
+    </div>
+
+    <div class="demo-showcase" id="demo-showcase">
+      <h2>See a real demo in action</h2>
+      <p>Watch how Mike’s Pest Control guides a new customer through their booking page — no code, no design skills.</p>
+      <div class="demo-stage-wrap">
+        <div class="demo-stage" id="demo-stage" style="max-width:640px;">
+          <img id="demo-img" src="" alt="Demo preview" style="display:none;">
+          <div class="demo-spotlight" id="demo-spotlight"></div>
+          <div class="demo-bubble" id="demo-bubble">
+            <h4 id="demo-bubble-step">Step 1</h4>
+            <p id="demo-bubble-text">Welcome to the demo.</p>
+          </div>
+        </div>
+        <div class="demo-controls">
+          <button class="btn btn-ghost btn-sm" id="demo-prev" onclick="demoPrev()">&#9664; Back</button>
+          <div class="demo-progress"><div class="demo-progress-bar" id="demo-progress-bar" style="width:0%"></div></div>
+          <button class="btn btn-primary btn-sm" id="demo-next" onclick="demoNext()">Next &#9654;</button>
+          <button class="btn btn-ghost btn-sm" onclick="startInlineDemo()">&#9654; Replay</button>
+        </div>
+        <p style="margin-top:14px;font-size:13px;color:var(--text-dim);">This demo was built in 90 seconds. <a href="#" onclick="router('capture');return false;" style="color:var(--accent);font-weight:600;">Build yours now &rarr;</a></p>
       </div>
     </div>
 
@@ -344,25 +407,41 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       </div>
     </div>
     <div class="landing-features">
-      <div class="feature-card">
+      <div class="feature-card" onclick="toggleFeature(this);router('capture')">
         <div class="feature-icon">&#128247;</div>
         <h3>Capture Anything</h3>
         <p>Paste a website URL or upload a screenshot. DemoForge handles the rest.</p>
+        <div class="feature-detail">
+          <p>Works with any public website, local image, or drag-and-drop screenshot. We snapshot it at full resolution so your demo stays crisp on retina screens.</p>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Capturing</button>
+        </div>
       </div>
-      <div class="feature-card">
+      <div class="feature-card" onclick="toggleFeature(this)">
         <div class="feature-icon">&#128204;</div>
         <h3>Drop Hotspots</h3>
         <p>Click anywhere on your screen to add guided pointers with your own words.</p>
+        <div class="feature-detail">
+          <p>Each hotspot becomes a step in your tour. Add a headline, body text, or just a quick tip. Reorder steps by dragging or click the arrows.</p>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Try the Editor</button>
+        </div>
       </div>
-      <div class="feature-card">
+      <div class="feature-card" onclick="toggleFeature(this)">
         <div class="feature-icon">&#127760;</div>
         <h3>Share One Link</h3>
         <p>Your prospect opens it on any phone. No app to install. No login needed.</p>
+        <div class="feature-detail">
+          <p>Copy a plain link, grab a QR code, or paste an embed iframe into your website. Your demo lives on our server forever on the free plan.</p>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();showToast('Build a demo first to get your share link.')">Learn More</button>
+        </div>
       </div>
-      <div class="feature-card">
+      <div class="feature-card" onclick="toggleFeature(this)">
         <div class="feature-icon">&#128176;</div>
         <h3>Built for Small Biz</h3>
         <p>Starts at free. Pro is $19/month. No enterprise contract or sales call required.</p>
+        <div class="feature-detail">
+          <p>Free plan: unlimited demos, QR codes, and embeds. Pro adds custom branding, analytics, and password protection. Cancel anytime.</p>
+          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Free</button>
+        </div>
       </div>
     </div>
   </div>
@@ -554,6 +633,7 @@ function toggleHiW(){
   if(p && p.classList.contains('show')){
     p.scrollIntoView({behavior:'smooth', block:'start'});
   }
+  startInlineDemo();
 }
 
 /* ========= CAPTURE ========= */
@@ -835,8 +915,7 @@ function loadDraft(){
 /* ========= PLAYER ========= */
 function previewDemo(){ playFromStep(0); }
 function playSample(){
-  const svg='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="70"/><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="30" y="44">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="18" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="40">Book Now</text><rect fill="#1e293b" x="60" y="110" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="160">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="200">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="240" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="268">Get a Free Quote</text><rect fill="#1e293b" x="580" y="110" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="150">Customer Reviews</text><rect fill="#334155" x="610" y="180" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="210">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="230">"professional. No more ants!"</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="250">- Sarah J.</text><rect fill="#334155" x="610" y="280" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="340">- Mike R.</text><rect fill="#334155" x="610" y="380" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="410">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="440">- Linda K.</text><rect fill="#1e293b" x="60" y="360" width="480" height="190" rx="10"/><text fill="#e5e7eb" font-size="20" font-family="sans-serif" x="90" y="410">Our Services</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="445">Residential pest control</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="470">Commercial inspections</text><text fill="#94a3b8" font-size="14" font-family="sans-serif" x="90" y="495">Emergency same-day visits</text></svg>');
-  state.source={type:'image',url:null,imageData:svg};
+  state.source={type:'image',url:null,imageData:getSampleSVG()};
   state.title="Mike's Pest Control Demo";
   state.hotspots=[
     {id:1,pctX:.45,pctY:.08,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
@@ -960,6 +1039,117 @@ function showEmbedCode(){
   }
 }
 
+
+/* ========= HERO MINI TOUR ========= */
+let heroTourTimer=null;
+function playHeroTour(){
+  if(heroTourTimer){clearTimeout(heroTourTimer);}
+  const spotlight=document.getElementById('hero-spotlight');
+  const bubble=document.getElementById('hero-bubble');
+  const btext=document.getElementById('hero-bubble-text');
+  const visual=document.querySelector('.hero-visual');
+  if(!spotlight||!bubble||!visual)return;
+  const steps=[
+    {sel:'.mock-headline',txt:'<strong>Headline</strong>Your headline tells visitors what you do in under 3 seconds.'},
+    {sel:'.mock-btn',txt:'<strong>Call to Action</strong>One-tap booking. They pick a time, you get a text.'},
+    {sel:'.mock-card',txt:'<strong>Social Proof</strong>Reviews front and center. Trust sells while you sleep.'}
+  ];
+  let i=0;
+  function showStep(){
+    if(i>=steps.length){spotlight.classList.remove('active');bubble.classList.remove('active');return;}
+    const el=visual.querySelector(steps[i].sel);
+    if(!el){i++;showStep();return;}
+    const r=el.getBoundingClientRect();
+    const vr=visual.getBoundingClientRect();
+    const sx=r.left-vr.left+r.width/2-40;
+    const sy=r.top-vr.top+r.height/2-40;
+    spotlight.style.left=sx+'px'; spotlight.style.top=sy+'px';
+    spotlight.classList.add('active');
+    btext.innerHTML=steps[i].txt;
+    // position bubble next to spotlight
+    let bx=sx+90, by=sy-10;
+    if(bx+220>vr.width)bx=sx-230;
+    if(by+80>vr.height)by=vr.height-90;
+    bubble.style.left=bx+'px'; bubble.style.top=by+'px';
+    bubble.classList.add('active');
+    i++;
+    heroTourTimer=setTimeout(showStep,2500);
+  }
+  showStep();
+}
+function stopHeroTour(){if(heroTourTimer)clearTimeout(heroTourTimer);document.getElementById('hero-spotlight').classList.remove('active');document.getElementById('hero-bubble').classList.remove('active');}
+
+/* ========= INLINE DEMO PLAYER ========= */
+let demoState={idx:0,hotspots:[],playing:false,timer:null};
+function getSampleSVG(){
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="70"/><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="30" y="44">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="18" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="40">Book Now</text><rect fill="#1e293b" x="60" y="110" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="160">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="200">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="240" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="268">Get a Free Quote</text><rect fill="#1e293b" x="580" y="110" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="150">Customer Reviews</text><rect fill="#334155" x="610" y="180" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="210">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="230">"professional. No more ants!"</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="250">- Sarah J.</text><rect fill="#334155" x="610" y="280" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="340">- Mike R.</text><rect fill="#334155" x="610" y="380" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="410">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="430">- Jen D.</text></svg>');
+}
+function startInlineDemo(){
+  const img=document.getElementById('demo-img');
+  const stage=document.getElementById('demo-stage');
+  if(!img||!stage)return;
+  img.src=getSampleSVG(); img.style.display='block';
+  demoState.hotspots=[
+    {pctX:.45,pctY:.08,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
+    {pctX:.88,pctY:.06,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
+    {pctX:.22,pctY:.37,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
+    {pctX:.78,pctY:.30,text:'Reviews front and center. Social proof sells while you sleep.'}
+  ];
+  demoState.idx=0; demoState.playing=true;
+  img.onload=function(){setTimeout(renderDemoStep,50);};
+  setTimeout(renderDemoStep,150);
+}
+function renderDemoStep(){
+  const h=demoState.hotspots[demoState.idx];
+  const spot=document.getElementById('demo-spotlight');
+  const bubble=document.getElementById('demo-bubble');
+  const stage=document.getElementById('demo-stage');
+  const img=document.getElementById('demo-img');
+  if(!h||!spot||!bubble||!stage||!img)return;
+  if(!img.complete||img.naturalWidth===0){setTimeout(renderDemoStep,50);return;}
+  const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
+  spot.style.left=(sx-50)+'px'; spot.style.top=(sy-50)+'px'; spot.classList.add('active');
+  document.getElementById('demo-bubble-step').textContent='Step '+(demoState.idx+1)+' of '+demoState.hotspots.length;
+  document.getElementById('demo-bubble-text').textContent=h.text;
+  let bx=sx+70, by=sy-20;
+  if(sy+120>stage.offsetHeight)by=sy-120;
+  if(sx+280+70>stage.offsetWidth)bx=sx-290;
+  bubble.style.left=bx+'px'; bubble.style.top=by+'px'; bubble.classList.add('active');
+  const pct=((demoState.idx+1)/demoState.hotspots.length)*100;
+  document.getElementById('demo-progress-bar').style.width=pct+'%';
+}
+function demoNext(){if(demoState.idx<demoState.hotspots.length-1){demoState.idx++;renderDemoStep();}else{showToast('Demo complete! Try building your own.');}}
+function demoPrev(){if(demoState.idx>0){demoState.idx--;renderDemoStep();}}
+
+/* ========= FEATURE CARDS ========= */
+function toggleFeature(card){card.classList.toggle('expanded');}
+
+/* ========= RESUME NAV ========= */
+function resumeFromNav(){
+  const raw=localStorage.getItem('demoforge-draft');
+  if(!raw)return;
+  try{
+    const draft=JSON.parse(raw);
+    if(draft.source && (draft.source.imageData||draft.source.url) && draft.hotspots){
+      state.title=draft.title||'My Product Demo';
+      state.source=draft.source;
+      state.hotspots=(draft.hotspots||[]).map((h,i)=>({id:i+1,pctX:h.pctX,pctY:h.pctY,text:h.text}));
+      nextHotspotId=state.hotspots.length+1;
+      enterEditor();
+      setTimeout(()=>{state.hotspots.forEach(h=>renderHotspot(h));renderSteps();},50);
+    }
+  }catch(e){console.error('Bad draft',e);}
+}
+function checkResumeNav(){
+  const raw=localStorage.getItem('demoforge-draft');
+  const el=document.getElementById('nav-resume');
+  if(el && raw){
+    try{const d=JSON.parse(raw);if(d.source&&(d.source.imageData||d.source.url)&&d.hotspots&&d.hotspots.length>0)el.classList.add('show');}catch(e){}
+  }
+}
+
+/* ========= TOGGLE HIW ========= */
+
 /* ========= HASH PLAYBACK ========= */
 function handleHash(){
   const hash=window.location.hash;
@@ -975,11 +1165,13 @@ function handleHash(){
     }catch(e){ console.error('Bad hash',e); }
   }
   router('landing');
-  // After landing, check draft
+  // After landing, check draft and start showcase
   setTimeout(loadDraft,600);
+  setTimeout(startInlineDemo,800);
 }
 window.addEventListener('hashchange',handleHash);
 handleHash();
+checkResumeNav();
 </script>
 </body>
 </html>
