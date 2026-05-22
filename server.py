@@ -5,9 +5,9 @@ Serves the frontend from ./index.html, stores demos as JSON files, and handles
 server-side screenshot capture via Playwright.
 """
 
-import json, os, uuid, urllib.request, urllib.error, html, base64
+import json, os, uuid, urllib.request, html, base64
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs, unquote
+from urllib.parse import urlparse, parse_qs
 
 PORT = 9000
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -249,7 +249,6 @@ class Handler(BaseHTTPRequestHandler):
             "const prog = document.getElementById('prog');\n"
             "const img = document.getElementById('img');\n"
             "const frame = document.getElementById('frame');\n"
-            "function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }\n"
             "function render() {\n"
             "  const h = hotspots[cur];\n"
             "  if (!h) return;\n"
