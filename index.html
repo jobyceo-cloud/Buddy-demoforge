@@ -118,9 +118,12 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 
 /* Feature card interactivity */
 .feature-card{cursor:pointer;overflow:hidden;}
-.feature-detail{max-height:0;overflow:hidden;opacity:0;margin-top:0;transition:max-height .35s ease,opacity .25s ease,margin-top .25s ease;}
-.feature-card.expanded .feature-detail{max-height:300px;opacity:1;margin-top:12px;}
+.feature-detail{max-height:0;overflow:hidden;opacity:0;margin-top:0;transition:max-height .35s ease,opacity .25s ease,margin-top .25s ease;pointer-events:none;}
+.feature-detail *{pointer-events:none;}
+.feature-card.expanded .feature-detail{max-height:300px;opacity:1;margin-top:12px;pointer-events:auto;}
+.feature-card.expanded .feature-detail *{pointer-events:auto;}
 .feature-detail > div{padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
+.feature-card.expanded .feature-detail > div{pointer-events:auto;}
 .feature-detail p{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px;}
 .feature-detail .btn-sm{margin-top:4px;}
 
@@ -375,7 +378,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       </div>
     </div>
     <div class="landing-features">
-      <div class="feature-card" onclick="toggleFeature(this)">
+      <div class="feature-card">
         <div class="feature-icon">&#128247;</div>
         <h3>Capture Anything</h3>
         <p>Paste a website URL or upload a screenshot. DemoForge handles the rest.</p>
@@ -386,7 +389,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           </div>
         </div>
       </div>
-      <div class="feature-card" onclick="toggleFeature(this)">
+      <div class="feature-card">
         <div class="feature-icon">&#128204;</div>
         <h3>Drop Hotspots</h3>
         <p>Click anywhere on your screen to add guided pointers with your own words.</p>
@@ -397,7 +400,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           </div>
         </div>
       </div>
-      <div class="feature-card" onclick="toggleFeature(this)">
+      <div class="feature-card">
         <div class="feature-icon">&#127760;</div>
         <h3>Share One Link</h3>
         <p>Your prospect opens it on any phone. No app to install. No login needed.</p>
@@ -408,7 +411,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           </div>
         </div>
       </div>
-      <div class="feature-card" onclick="toggleFeature(this)">
+      <div class="feature-card">
         <div class="feature-icon">&#128176;</div>
         <h3>Built for Small Biz</h3>
         <p>Starts at free. Pro is $19/month. No enterprise contract or sales call required.</p>
@@ -420,6 +423,19 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
         </div>
       </div>
     </div>
+    <script>
+    (function(){
+      const grid=document.querySelector('.landing-features');
+      if(!grid)return;
+      grid.addEventListener('click',function(e){
+        const card=e.target.closest('.feature-card');
+        if(!card||!grid.contains(card))return;
+        const was=card.classList.contains('expanded');
+        grid.querySelectorAll('.feature-card').forEach(c=>c.classList.remove('expanded'));
+        if(!was)card.classList.add('expanded');
+      });
+    })();
+    </script>
   </div>
 </div>
 
