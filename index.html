@@ -329,30 +329,9 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       <span class="trust">Free forever plan</span>
     </div>
 
-    <div class="hero-visual">
-      <div class="mock-chrome">
-        <div class="mock-dots"><span style="background:#ef4444;"></span><span style="background:#f59e0b;"></span><span style="background:#22c55e;"></span></div>
-        <div class="mock-url">mikes-pest-control.com/book-now</div>
-      </div>
-      <div class="mock-body">
-        <div class="mock-left">
-          <div class="mock-logo"></div>
-          <div class="mock-headline"></div>
-          <div class="mock-sub"></div>
-          <div class="mock-btn"></div>
-        </div>
-        <div class="mock-right">
-          <div class="mock-card">
-            <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
-            <div class="mock-hotspot" onclick="playHeroTour()">1</div>
-          </div>
-      </div>
-    </div>
-
     <div class="demo-showcase" id="demo-showcase">
       <h2>See a real demo in action</h2>
-      <p>Watch how Mike’s Pest Control guides a new customer through their booking page — no code, no design skills.</p>
+      <p>Watch how Mike's Pest Control guides a new customer through their booking page -- no code, no design skills.</p>
       <div class="demo-stage-wrap">
         <div class="demo-stage" id="demo-stage" style="max-width:640px;">
           <img id="demo-img" src="" alt="Demo preview" style="display:none;">
@@ -1027,15 +1006,6 @@ function showEmbedCode(){
   }
 }
 
-
-/* ========= HERO MINI TOUR ========= */
-let heroTourTimer=null;
-function playHeroTour(){
-  if(heroTourTimer){clearTimeout(heroTourTimer);}
-  startInlineDemo();
-  const showcase=document.getElementById('demo-showcase');
-  if(showcase)showcase.scrollIntoView({behavior:'smooth',block:'start'});
-}
 
 /* ========= INLINE DEMO PLAYER ========= */
 let demoState={idx:0,hotspots:[],playing:false,timer:null};
