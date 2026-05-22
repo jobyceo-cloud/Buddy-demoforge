@@ -117,9 +117,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .demo-progress-bar{height:100%;background:var(--accent);transition:width .5s ease;width:0%;}
 
 /* Feature card interactivity */
-.feature-card{cursor:pointer;}
-.feature-detail{max-height:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease,margin .3s ease;opacity:0;}
-.feature-card.expanded .feature-detail{max-height:140px;opacity:1;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
+.feature-card{cursor:pointer;overflow:hidden;}
+.feature-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease,opacity .25s ease;margin-top:0;opacity:0;}
+.feature-detail > *{overflow:hidden;}
+.feature-card.expanded .feature-detail{grid-template-rows:1fr;opacity:1;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
 .feature-detail p{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px;}
 .feature-detail .btn-sm{margin-top:4px;}
 
@@ -129,7 +130,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 
 .section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
 .landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:0 auto; padding:0 12px 80px; }
-.feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; transition:.15s; }
+.feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; transition:.15s; overflow:hidden; }
 .feature-card:hover { border-color:rgba(255,255,255,.12); transform:translateY(-2px); }
 .feature-icon { width:36px; height:36px; background:var(--surface-2); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:16px; }
 .feature-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; }
@@ -379,8 +380,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
         <h3>Capture Anything</h3>
         <p>Paste a website URL or upload a screenshot. DemoForge handles the rest.</p>
         <div class="feature-detail">
-          <p>Works with any public website, local image, or drag-and-drop screenshot. We snapshot it at full resolution so your demo stays crisp on retina screens.</p>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Capturing</button>
+          <div>
+            <p>Works with any public website, local image, or drag-and-drop screenshot. We snapshot it at full resolution so your demo stays crisp on retina screens.</p>
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Capturing</button>
+          </div>
         </div>
       </div>
       <div class="feature-card" onclick="toggleFeature(this)">
@@ -388,8 +391,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
         <h3>Drop Hotspots</h3>
         <p>Click anywhere on your screen to add guided pointers with your own words.</p>
         <div class="feature-detail">
-          <p>Each hotspot becomes a step in your tour. Add a headline, body text, or just a quick tip. Reorder steps by dragging or click the arrows.</p>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Try the Editor</button>
+          <div>
+            <p>Each hotspot becomes a step in your tour. Add a headline, body text, or just a quick tip. Reorder steps by dragging or click the arrows.</p>
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Try the Editor</button>
+          </div>
         </div>
       </div>
       <div class="feature-card" onclick="toggleFeature(this)">
@@ -397,8 +402,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
         <h3>Share One Link</h3>
         <p>Your prospect opens it on any phone. No app to install. No login needed.</p>
         <div class="feature-detail">
-          <p>Copy a plain link, grab a QR code, or paste an embed iframe into your website. Your demo lives on our server forever on the free plan.</p>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();showToast('Build a demo first to get your share link.')">Learn More</button>
+          <div>
+            <p>Copy a plain link, grab a QR code, or paste an embed iframe into your website. Your demo lives on our server forever on the free plan.</p>
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();showToast('Build a demo first to get your share link.')">Learn More</button>
+          </div>
         </div>
       </div>
       <div class="feature-card" onclick="toggleFeature(this)">
@@ -406,8 +413,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
         <h3>Built for Small Biz</h3>
         <p>Starts at free. Pro is $19/month. No enterprise contract or sales call required.</p>
         <div class="feature-detail">
-          <p>Free plan: unlimited demos, QR codes, and embeds. Pro adds custom branding, analytics, and password protection. Cancel anytime.</p>
-          <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Free</button>
+          <div>
+            <p>Free plan: unlimited demos, QR codes, and embeds. Pro adds custom branding, analytics, and password protection. Cancel anytime.</p>
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();router('capture')">Start Free</button>
+          </div>
         </div>
       </div>
     </div>
