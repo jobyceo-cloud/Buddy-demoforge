@@ -91,16 +91,15 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .mock-headline { width:75%; height:20px; background:rgba(255,255,255,.35); border-radius:4px; margin-top:6px; }
 .mock-sub { width:55%; height:14px; background:rgba(255,255,255,.18); border-radius:4px; }
 .mock-btn { width:120px; height:34px; background:var(--accent); border-radius:8px; margin-top:10px; opacity:.85; }
-.mock-right { width:170px; }
+.mock-right { width:170px; position:relative; display:flex; flex-direction:column; }
 .mock-card { background:#1e293b; border-radius:10px; padding:14px; border:1px solid rgba(255,255,255,.08); }
 .mock-stars { color:#f59e0b; font-size:13px; letter-spacing:2px; }
 .mock-review { color:#94a3b8; font-size:11px; margin-top:6px; line-height:1.4; }
-.mock-hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; transform:translate(-50%,-50%); cursor:pointer; z-index:10; }
-.mock-hotspot:hover { transform:translate(-50%,-50%) scale(1.12); }
-.mock-bubble { position:absolute; left: calc(30% + 32px); top: 16%; background:var(--surface-2); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:12px 14px; width:240px; box-shadow:var(--shadow); z-index:5; box-sizing:border-box; }
-.mock-bubble::before { content:""; position:absolute; left:-6px; top:14px; width:12px; height:12px; background:var(--surface-2); border-left:1px solid rgba(255,255,255,.15); border-bottom:1px solid rgba(255,255,255,.15); transform:rotate(45deg); }
-.mock-bubble h5 { font-size:13px; color:var(--accent-2); margin-bottom:4px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mock-bubble p { font-size:12px; color:var(--text-dim); line-height:1.4; }
+.mock-tooltip { background:var(--surface-2); border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:12px 14px; margin-top:12px; }
+.mock-tooltip h5 { font-size:13px; color:var(--accent-2); margin-bottom:4px; font-weight:700; }
+.mock-tooltip p { font-size:12px; color:var(--text-dim); line-height:1.4; }
+.mock-hotspot { position:absolute; left:auto; right:8px; top:auto; bottom:6px; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; cursor:pointer; z-index:10; }
+.mock-hotspot:hover { transform:scale(1.12); }
 
 .section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
 .landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:0 auto; padding:0 12px 80px; }
@@ -129,8 +128,6 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 @media (max-width:700px) {
   .hiw-steps { grid-template-columns:1fr; }
   .mock-right { display:none; }
-  .mock-bubble { width:200px; padding:10px 12px; left: calc(20% + 28px); top: 10%; }
-  .mock-bubble::before { left:-6px; top:12px; }
 }
 @media (max-width:600px) {
   .landing-hero { padding:48px 20px 64px; }
@@ -322,12 +319,12 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
             <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
             <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
           </div>
+          <div class="mock-tooltip">
+            <h5>Social Proof Sells</h5>
+            <p>Reviews are the first thing your customer trusts. Put them above the fold.</p>
+          </div>
+          <div class="mock-hotspot">1</div>
         </div>
-      </div>
-      <div class="mock-hotspot" style="left:30%;top:18%;">1</div>
-      <div class="mock-bubble">
-        <h5>Social Proof Sells</h5>
-        <p>Reviews are the first thing your customer trusts. Put them above the fold.</p>
       </div>
     </div>
 
