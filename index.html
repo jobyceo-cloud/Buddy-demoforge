@@ -85,9 +85,9 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .demo-showcase h2{font-size:26px;font-weight:700;margin-bottom:8px;}
 .demo-showcase>p{color:var(--text-dim);font-size:15px;margin-bottom:24px;}
 .demo-stage-wrap{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:24px;position:relative;}
-.demo-stage{position:relative;max-width:100%;background:var(--surface-2);border-radius:var(--radius);overflow:hidden;margin:0 auto;}
-.demo-stage img{display:block;width:100%;height:auto;}
-.demo-spotlight{position:absolute;width:100px;height:100px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.82);pointer-events:none;transition:all .6s cubic-bezier(.22,1,.36,1);opacity:0;}
+.demo-stage{position:relative;max-width:100%;background:var(--surface-2);border-radius:var(--radius);overflow:hidden;margin:0 auto; aspect-ratio:900/640;}
+.demo-stage img{display:block;width:100%;height:100%;object-fit:cover;}
+.demo-spotlight{position:absolute;width:60px;height:60px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.82);pointer-events:none;transition:all .6s cubic-bezier(.22,1,.36,1);opacity:0;}
 .demo-spotlight.active{opacity:1;}
 .demo-spotlight::after{content:"";position:absolute;inset:-6px;border:2px solid var(--accent);border-radius:50%;animation:pulse 2s infinite;}
 .demo-bubble{position:absolute;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-lg);padding:16px 18px;max-width:260px;box-shadow:var(--shadow);transition:all .4s ease;opacity:0;z-index:10;}
@@ -1019,7 +1019,7 @@ function showEmbedCode(){
 /* ========= INLINE DEMO PLAYER ========= */
 let demoState={idx:0,hotspots:[],playing:false,timer:null};
 function getSampleSVG(){
-  return 'data:image/svg+xml;utf8,encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640"><rect fill="#0f172a" width="900" height="640"/><rect fill="#1e293b" x="0" y="0" width="900" height="160"/><path fill="#22d3ee" d="M44,90 L58,90 L62,98 L62,112 L58,120 L44,120 L40,112 L40,98 Z"/><text fill="#0f172a" font-size="16" font-weight="bold" font-family="sans-serif" text-anchor="middle" x="51" y="111">P</text><text fill="#e5e7eb" font-size="22" font-family="sans-serif" x="72" y="115">Mikes Pest Control</text><rect fill="#0ea5e9" x="720" y="88" width="150" height="34" rx="6"/><text fill="#fff" font-size="14" font-family="sans-serif" text-anchor="middle" x="795" y="108">Book Now</text><rect fill="#1e293b" x="60" y="190" width="480" height="220" rx="10"/><text fill="#94a3b8" font-size="16" font-family="sans-serif" x="90" y="240">Fast. Safe. Guaranteed.</text><text fill="#e5e7eb" font-size="28" font-family="sans-serif" x="90" y="280">Protect your home today.</text><rect fill="#0ea5e9" x="90" y="320" width="160" height="44" rx="8"/><text fill="#fff" font-size="16" font-family="sans-serif" text-anchor="middle" x="170" y="348">Get a Free Quote</text><rect fill="#1e293b" x="580" y="190" width="260" height="440" rx="10"/><text fill="#e5e7eb" font-size="18" font-family="sans-serif" x="610" y="230">Customer Reviews</text><rect fill="#334155" x="610" y="260" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="290">"Came same day. Very"</text><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="310">professional. No more ants!</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="330">- Sarah J.</text><rect fill="#334155" x="610" y="360" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="390">"Best in town, fair price."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="410">- Mike R.</text><rect fill="#334155" x="610" y="460" width="200" height="80" rx="6"/><text fill="#94a3b8" font-size="13" font-family="sans-serif" x="625" y="490">"Highly recommend."</text><text fill="#e5e7eb" font-size="12" font-family="sans-serif" x="625" y="510">- Jen D.</text></svg>');
+  return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNjQwIj48cmVjdCBmaWxsPSIjMGYxNzJhIiB3aWR0aD0iOTAwIiBoZWlnaHQ9IjY0MCIvPjxyZWN0IGZpbGw9IiMxZTI5M2IiIHg9IjAiIHk9IjAiIHdpZHRoPSI5MDAiIGhlaWdodD0iMTM1Ii8+PGNpcmNsZSBmaWxsPSIjMjJkM2VlIiBjeD0iNTUiIGN5PSI3NSIgcj0iMjIiLz48dGV4dCBmaWxsPSIjMGYxNzJhIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjU1IiB5PSI4MiI+TTwvdGV4dD48dGV4dCBmaWxsPSIjZTVlN2ViIiBmb250LXNpemU9IjI0IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgeD0iOTAiIHk9IjgzIj5NaWtlcyBQZXN0IENvbnRyb2w8L3RleHQ+PHJlY3QgZmlsbD0iIzBlYTVlOSIgeD0iNzQwIiB5PSI1NyIgd2lkdGg9IjEzMCIgaGVpZ2h0PSIzNiIgcng9IjgiLz48dGV4dCBmaWxsPSIjZmZmIiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iODA1IiB5PSI3OSI+Qm9vayBOb3c8L3RleHQ+PHJlY3QgZmlsbD0iIzFlMjkzYiIgeD0iNTAiIHk9IjE2NSIgd2lkdGg9IjUwMCIgaGVpZ2h0PSIyMjAiIHJ4PSIxMiIvPjx0ZXh0IGZpbGw9IiM5NGEzYjgiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiB4PSI4MCIgeT0iMjE1Ij5GYXN0LiBTYWZlLiBHdWFyYW50ZWVkLjwvdGV4dD48dGV4dCBmaWxsPSIjZTVlN2ViIiBmb250LXNpemU9IjMyIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgeD0iODAiIHk9IjI2NSI+UHJvdGVjdCB5b3VyIGhvbWUgdG9kYXkuPC90ZXh0PjxyZWN0IGZpbGw9IiMwZWE1ZTkiIHg9IjgwIiB5PSIzMDUiIHdpZHRoPSIxNzAiIGhlaWdodD0iNDQiIHJ4PSI4Ii8+PHRleHQgZmlsbD0iI2ZmZiIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE2NSIgeT0iMzMzIj5HZXQgYSBGcmVlIFF1b3RlPC90ZXh0PjxyZWN0IGZpbGw9IiMxZTI5M2IiIHg9IjU4MCIgeT0iMTY1IiB3aWR0aD0iMjcwIiBoZWlnaHQ9IjM2MCIgcng9IjEyIi8+PHRleHQgZmlsbD0iI2U1ZTdlYiIgZm9udC1zaXplPSIyMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHg9IjYxMCIgeT0iMjA1Ij5DdXN0b21lciBSZXZpZXdzPC90ZXh0PjxyZWN0IGZpbGw9IiMzMzQxNTUiIHg9IjYxMCIgeT0iMjI1IiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjcwIiByeD0iOCIvPjx0ZXh0IGZpbGw9IiM5NGEzYjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiB4PSI2MjUiIHk9IjI1MCI+IkNhbWUgc2FtZSBkYXkuIFZlcnkiPC90ZXh0Pjx0ZXh0IGZpbGw9IiM5NGEzYjgiIGZvbnQtc2l6ZT0iMTMiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiB4PSI2MjUiIHk9IjI2NyI+cHJvZmVzc2lvbmFsLiBObyBtb3JlIGFudHMhIjwvdGV4dD48dGV4dCBmaWxsPSIjZTVlN2ViIiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgeD0iNjI1IiB5PSIyODMiPi0gU2FyYWggSi48L3RleHQ+PHJlY3QgZmlsbD0iIzMzNDE1NSIgeD0iNjEwIiB5PSIzMTUiIHdpZHRoPSIyMTAiIGhlaWdodD0iNzAiIHJ4PSI4Ii8+PHRleHQgZmlsbD0iIzk0YTNiOCIgZm9udC1zaXplPSIxMyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHg9IjYyNSIgeT0iMzQwIj4iQmVzdCBpbiB0b3duLCBmYWlyIHByaWNlLiI8L3RleHQ+PHRleHQgZmlsbD0iI2U1ZTdlYiIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHg9IjYyNSIgeT0iMzU2Ij4tIE1pa2UgUi48L3RleHQ+PHJlY3QgZmlsbD0iIzMzNDE1NSIgeD0iNjEwIiB5PSI0MDUiIHdpZHRoPSIyMTAiIGhlaWdodD0iNzAiIHJ4PSI4Ii8+PHRleHQgZmlsbD0iIzk0YTNiOCIgZm9udC1zaXplPSIxMyIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHg9IjYyNSIgeT0iNDMwIj4iSGlnaGx5IHJlY29tbWVuZC4iPC90ZXh0Pjx0ZXh0IGZpbGw9IiNlNWU3ZWIiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiB4PSI2MjUiIHk9IjQ0NiI+LSBKZW4gRC48L3RleHQ+PC9zdmc+';
 }
 function startInlineDemo(){
   const img=document.getElementById('demo-img');
@@ -1027,10 +1027,10 @@ function startInlineDemo(){
   if(!img||!stage)return;
   img.src=getSampleSVG(); img.style.display='block';
   demoState.hotspots=[
-    {pctX:.111,pctY:.172,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
-    {pctX:.883,pctY:.164,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
-    {pctX:.189,pctY:.534,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
-    {pctX:.75,pctY:.352,text:'Reviews front and center. Social proof sells while you sleep.'}
+    {pctX:0.0611,pctY:0.1172,text:'Your logo and phone number are the first things customers see. Make them bold and easy to find.'},
+    {pctX:0.8944,pctY:0.1172,text:'One-tap booking. They pick a time, you get a text. You never miss a lead again.'},
+    {pctX:0.1833,pctY:0.5109,text:'Your hero headline tells them exactly what you do in under 3 seconds.'},
+    {pctX:0.7944,pctY:0.3047,text:'Reviews front and center. Social proof sells while you sleep.'}
   ];
   demoState.idx=0; demoState.playing=true;
   img.onload=function(){setTimeout(renderDemoStep,50);};
@@ -1046,7 +1046,7 @@ function renderDemoStep(){
   if(!img.complete||img.naturalWidth===0){setTimeout(renderDemoStep,50);return;}
 
   const sx=h.pctX*stage.offsetWidth, sy=h.pctY*stage.offsetHeight;
-  const SPOT_R=50; // spotlight radius (100x100 circle)
+  const SPOT_R=30; // spotlight radius (60x60 circle)
   const PAD=20;    // padding between spotlight and bubble
 
   // Position spotlight centered on hotspot
