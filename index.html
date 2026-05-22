@@ -27,7 +27,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
    Animations
    ============================================================ */
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(14,165,233,.5)} 70%{box-shadow:0 0 0 18px rgba(14,165,233,0)} 100%{box-shadow:0 0 0 0 rgba(14,165,233,0)} }
+@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(14,165,233,.4)} 70%{box-shadow:0 0 0 10px rgba(14,165,233,0)} 100%{box-shadow:0 0 0 0 rgba(14,165,233,0)} }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 @keyframes hintSlide { 0%{transform:translateX(-6px)} 50%{transform:translateX(6px)} 100%{transform:translateX(-6px)} }
 @keyframes spin { to{transform:rotate(360deg)} }
@@ -318,12 +318,8 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
           <div class="mock-card">
             <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
             <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
+            <div class="mock-hotspot" onclick="toggleHiW()">1</div>
           </div>
-          <div class="mock-tooltip">
-            <h5>Social Proof Sells</h5>
-            <p>Reviews are the first thing your customer trusts. Put them above the fold.</p>
-          </div>
-          <div class="mock-hotspot">1</div>
         </div>
       </div>
     </div>
