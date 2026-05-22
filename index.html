@@ -126,6 +126,8 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .step-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:var(--surface-3); border-radius:50%; font-size:11px; font-weight:700; color:var(--text-dim); margin-right:8px; }
 .step-item.active .step-num { background:var(--accent); color:#fff; }
 .step-text { font-size:13px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.step-item textarea.step-text { display:block; width:100%; min-height:42px; resize:vertical; background:var(--surface-3); border:1px solid rgba(255,255,255,.1); border-radius:6px; padding:6px 8px; font-size:13px; color:var(--text); margin-top:6px; -webkit-line-clamp:unset; overflow:auto; }
+.step-item textarea.step-text:focus { border-color:var(--accent); outline:none; }
 .step-actions { display:flex; gap:8px; margin-top:8px; opacity:0; transition:.15s; }
 .step-item:hover .step-actions { opacity:1; }
 .editor-footer { padding:16px; border-top:1px solid rgba(255,255,255,.06); display:flex; gap:10px; }
@@ -599,16 +601,22 @@ function openInlineEditor(id){
   clearHotspotForms();
   const h=state.hotspots.find(x=>x.id===id); if(!h)return;
   const canvas=document.getElementById('editor-canvas');
+  const stage=document.getElementById('editor-stage');
   const form=document.createElement('div');
   form.className='hotspot-editor-form';
   form.id='inline-editor';
   const px=h.pctX*canvas.offsetWidth, py=h.pctY*canvas.offsetHeight;
+  const FORM_W=300, FORM_H=170;
   let fx=px+20, fy=py-20;
-  // Clamp to canvas bounds so form never leaves the image
-  if(fx+280>canvas.offsetWidth) fx=canvas.offsetWidth-300;
-  if(fx<10) fx=10;
-  if(fy+160>canvas.offsetHeight) fy=canvas.offsetHeight-170;
-  if(fy<10) fy=10;
+  // Clamp to visible scrollport so form never goes under sidebar or off-screen
+  const maxFx = stage.scrollLeft + stage.clientWidth - FORM_W;
+  const maxFy = stage.scrollTop + stage.clientHeight - FORM_H;
+  const minFx = stage.scrollLeft + 10;
+  const minFy = stage.scrollTop + 10;
+  if(fx > maxFx) fx = maxFx;
+  if(fx < minFx) fx = minFx;
+  if(fy > maxFy) fy = maxFy;
+  if(fy < minFy) fy = minFy;
   form.style.left=fx+'px'; form.style.top=fy+'px';
   const taValue=h.isNew?'':escapeHtml(h.text);
   form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
@@ -652,7 +660,7 @@ function renderSteps(){
     return;
   }
   list.innerHTML=state.hotspots.map((h,i)=>'<div class="step-item '+(state.activeHotspot===h.id?'active':'')+'" onclick="highlightStep('+h.id+')">'+
-    '<span class="step-num">'+(i+1)+'</span><span class="step-text">'+escapeHtml(h.text)+'</span>'+
+    '<span class="step-num">'+(i+1)+'</span><textarea class="step-text" rows="2" onblur="saveStepText('+h.id+',this.value)" onclick="event.stopPropagation();">'+escapeHtml(h.text)+'</textarea>'+
     '<div class="step-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',-1)">&#9650;</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();moveHotspot('+i+',1)">&#9660;</button><button class="btn btn-sm btn-ghost" style="color:var(--danger)" onclick="event.stopPropagation();deleteHotspot('+h.id+')">Delete</button></div>'+
     '</div>').join('');
   document.getElementById('demo-title').textContent=state.title || 'Demo Steps';
@@ -667,6 +675,9 @@ function moveHotspot(idx,dir){
   const nIdx=idx+dir; if(nIdx<0||nIdx>=state.hotspots.length)return;
   const tmp=state.hotspots[idx]; state.hotspots[idx]=state.hotspots[nIdx]; state.hotspots[nIdx]=tmp;
   renderSteps(); autosave();
+}
+function saveStepText(id,value){
+  const h=state.hotspots.find(x=>x.id===id); if(h){h.text=value; autosave();}
 }
 function dismissHint(){
   state.hintDismissed=true;
