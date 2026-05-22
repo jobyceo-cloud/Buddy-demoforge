@@ -128,7 +128,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .step-text { font-size:13px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .step-item textarea.step-text { display:block; width:100%; min-height:42px; resize:vertical; background:var(--surface-3); border:1px solid rgba(255,255,255,.1); border-radius:6px; padding:6px 8px; font-size:13px; color:var(--text); margin-top:6px; -webkit-line-clamp:unset; overflow:auto; }
 .step-item textarea.step-text:focus { border-color:var(--accent); outline:none; }
-.step-actions { display:flex; gap:8px; margin-top:8px; opacity:0; transition:.15s; }
+.step-actions { display:flex; gap:8px; margin-top:8px; opacity:1; }
 .step-item:hover .step-actions { opacity:1; }
 .editor-footer { padding:16px; border-top:1px solid rgba(255,255,255,.06); display:flex; gap:10px; }
 
@@ -620,7 +620,7 @@ function openInlineEditor(id){
   form.style.left=fx+'px'; form.style.top=fy+'px';
   const taValue=h.isNew?'':escapeHtml(h.text);
   form.innerHTML='<textarea id="hs-text-'+id+'" placeholder="Type what you want the viewer to read when they reach this step...">'+taValue+'</textarea><div class="btn-row"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();deleteHotspot('+id+')">Delete</button><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();saveHotspot('+id+')">Save</button></div>';
-  canvas.appendChild(form);
+  stage.appendChild(form);
   form.onclick=function(e){e.stopPropagation();};
   form.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
   document.getElementById('hs-text-'+id).focus();
