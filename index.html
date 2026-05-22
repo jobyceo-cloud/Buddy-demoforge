@@ -80,7 +80,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .social-proof .stat { font-weight:600; color:var(--text); }
 .social-proof .trust { font-weight:500; }
 
-.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; }
+.hero-visual { width:100%; max-width:720px; margin:48px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; animation:fadeIn .8s ease both; }
 .mock-chrome { height:32px; background:#111827; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.08); }
 .mock-dots { display:flex; gap:6px; }
 .mock-dots span { width:10px; height:10px; border-radius:50%; background:#475569; display:block; }
@@ -97,9 +97,14 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .mock-review { color:#94a3b8; font-size:11px; margin-top:6px; line-height:1.4; }
 .mock-hotspot { position:absolute; left:auto; right:8px; top:auto; bottom:6px; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; cursor:pointer; z-index:10; }
 .mock-hotspot:hover { transform:scale(1.12); }
+.mock-tooltip{position:absolute;right:42px;bottom:4px;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:10px 14px;max-width:220px;box-shadow:var(--shadow);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease;pointer-events:none;z-index:11;}
+.mock-tooltip strong{display:block;font-size:12px;color:var(--accent-2);margin-bottom:4px;}
+.mock-tooltip p{font-size:11px;line-height:1.4;color:var(--text);margin:0;}
+.hero-visual:hover .mock-tooltip,.hero-visual:focus-within .mock-tooltip{opacity:1;transform:translateY(0);}
+.hero-visual:hover .mock-hotspot,.hero-visual:focus-within .mock-hotspot{animation-play-state:paused;transform:scale(1.15);}
 
 /* Inline demo showcase */
-.demo-showcase{max-width:800px;margin:80px auto 0;padding:0 12px;text-align:center;}
+.demo-showcase{max-width:800px;margin:48px auto 0;padding:0 12px;text-align:center;}
 .demo-showcase h2{font-size:26px;font-weight:700;margin-bottom:8px;}
 .demo-showcase>p{color:var(--text-dim);font-size:15px;margin-bottom:24px;}
 .demo-stage-wrap{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:24px;position:relative;}
@@ -131,8 +136,9 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .nav-resume{display:none;font-size:13px;color:var(--accent-2);font-weight:600;cursor:pointer;margin-left:12px;}
 .nav-resume.show{display:inline-block;}
 
-.section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
-.landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:0 auto; padding:0 12px 80px; }
+.section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 64px 0 24px; color:var(--text); }
+.landing-features { display:grid; grid-template-columns:repeat(2, 1fr); gap:18px; max-width:720px; width:100%; margin:0 auto; padding:0 12px 80px; }
+@media (max-width:560px){ .landing-features{ grid-template-columns:1fr; } }
 .feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; transition:.15s; overflow:hidden; }
 .feature-card:hover { border-color:rgba(255,255,255,.12); transform:translateY(-2px); }
 .feature-icon { width:36px; height:36px; background:var(--surface-2); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:16px; }
@@ -296,20 +302,24 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
     <span class="brand-title">DemoForge</span>
     <span class="brand-sub">v0.2</span>
   </div>
-  <div class="topbar-actions" id="topbar-actions">
+  <div class="topbar-actions">
+    <span class="nav-resume" id="nav-resume" onclick="resumeFromNav()">&#8634; Resume Demo</span>
     <button class="btn btn-ghost" onclick="newDemoConfirm()" id="btn-new-demo">New Demo</button>
-    <button class="btn btn-primary" onclick="publishDemo()" id="btn-publish">Publish &amp; Share</button>
+    <button class="btn btn-primary" onclick="publishDemo()" id="btn-publish">Publish & Share</button>
   </div>
 </div>
 
-<!-- LANDING NAV -->
 <div class="landing-nav" id="landing-nav">
   <div class="brand" onclick="newDemoConfirm()">
     <div class="brand-icon">DF</div>
     <span class="brand-title">DemoForge</span>
   </div>
+  <div class="landing-nav-links" style="display:flex;align-items:center;gap:20px;">
+    <a href="#features" style="font-size:14px;color:var(--text-dim);text-decoration:none;font-weight:500;">Features</a>
+    <a href="#hiw-panel" style="font-size:14px;color:var(--text-dim);text-decoration:none;font-weight:500;">How It Works</a>
+    <span class="nav-resume" id="nav-resume-landing" onclick="resumeFromNav()" style="display:none;font-size:14px;color:var(--accent-2);font-weight:600;cursor:pointer;">Resume Demo</span>
+  </div>
   <div class="topbar-actions">
-    <span class="nav-resume" id="nav-resume" onclick="resumeFromNav()">&#8634; Resume Demo</span>
     <button class="btn btn-ghost" onclick="newDemoConfirm()">New Demo</button>
   </div>
 </div>
@@ -331,6 +341,32 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       <span class="stat">2,400+</span> demos built
       <span class="sep"></span>
       <span class="trust">Free forever plan</span>
+    </div>
+
+    <div class="hero-visual" id="hero-visual">
+      <div class="mock-chrome">
+        <div class="mock-dots"><span></span><span></span><span></span></div>
+        <div class="mock-url">mikespestcontrol.com</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-left">
+          <div class="mock-logo"></div>
+          <div class="mock-headline"></div>
+          <div class="mock-sub"></div>
+          <div class="mock-btn"></div>
+        </div>
+        <div class="mock-right">
+          <div class="mock-card">
+            <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="mock-review">"Came same day. Very professional. No more ants!"</div>
+            <div class="mock-hotspot">1</div>
+            <div class="mock-tooltip" id="mock-tooltip">
+              <strong>Step 1</strong>
+              <p>Reviews sell while you sleep. Keep them above the fold.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="demo-showcase" id="demo-showcase">
@@ -355,7 +391,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       </div>
     </div>
 
-    <div class="section-title">Why teams choose DemoForge</div>
+    <div class="section-title" id="features">Why teams choose DemoForge</div>
 
     <div class="hiw-panel" id="hiw-panel">
       <p class="hiw-title">Build your guided tour in three steps</p>
@@ -625,7 +661,6 @@ function toggleHiW(){
   if(p && p.classList.contains('show')){
     p.scrollIntoView({behavior:'smooth', block:'start'});
   }
-  startInlineDemo();
 }
 
 /* ========= CAPTURE ========= */
@@ -1096,8 +1131,9 @@ function resumeFromNav(){
 function checkResumeNav(){
   const raw=localStorage.getItem('demoforge-draft');
   const el=document.getElementById('nav-resume');
-  if(el && raw){
-    try{const d=JSON.parse(raw);if(d.source&&(d.source.imageData||d.source.url)&&d.hotspots&&d.hotspots.length>0)el.classList.add('show');}catch(e){}
+  const el2=document.getElementById('nav-resume-landing');
+  if(raw){
+    try{const d=JSON.parse(raw);if(d.source&&(d.source.imageData||d.source.url)&&d.hotspots&&d.hotspots.length>0){if(el)el.classList.add('show');if(el2)el2.style.display='inline-block';}}catch(e){}
   }
 }
 
