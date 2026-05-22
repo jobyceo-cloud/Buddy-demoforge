@@ -56,30 +56,91 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .input { padding:12px 16px; border-radius:var(--radius); background:var(--surface-2); border:1px solid rgba(255,255,255,.1); color:var(--text); font-size:15px; width:100%; transition:.15s; }
 .input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
 
-/* ============================================================
-   LANDING SCREEN
-   ============================================================ */
-.landing-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 24px; text-align:center; }
-.landing-hero h1 { font-size:clamp(32px,5vw,60px); font-weight:800; line-height:1.05; letter-spacing:-1px; margin-bottom:16px; max-width:700px; }
-.landing-hero h1 span { background:linear-gradient(90deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.landing-hero p { font-size:clamp(16px,2vw,20px); color:var(--text-dim); max-width:560px; line-height:1.5; margin-bottom:36px; }
+/* LANDING NAV */
+.landing-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 24px; background:rgba(11,15,25,.8); backdrop-filter:blur(10px); border-bottom:1px solid rgba(255,255,255,.06); position:sticky; top:0; z-index:100; }
+.landing-nav .brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
+.landing-nav .brand-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:#fff; }
+.landing-nav .brand-title { font-size:18px; font-weight:700; letter-spacing:-.3px; }
+
+.landing-hero { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 24px 100px; text-align:center; }
+.landing-hero h1 { font-size:clamp(32px,5.5vw,56px); font-weight:800; line-height:1.08; letter-spacing:-1px; margin-bottom:16px; max-width:720px; color:#fff; word-break:keep-all; }
+.landing-hero h1 .accent-highlight { color:var(--accent-2); position:relative; }
+.landing-hero h1 .accent-highlight::after { content:""; position:absolute; bottom:0.05em; left:0; width:100%; height:0.12em; background:var(--accent); opacity:.35; border-radius:2px; z-index:-1; }
+
+.landing-hero h1 br.desktop-break { display:none; }
+@media (min-width:560px) { .landing-hero h1 br.desktop-break { display:block; } }
+
+.landing-hero p { font-size:clamp(16px,2vw,20px); color:var(--text-dim); max-width:560px; line-height:1.5; margin-bottom:32px; }
 .landing-cta { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
-.hero-visual { width:100%; max-width:680px; margin:50px auto 0; height:360px; background:var(--surface); border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.08); position:relative; overflow:hidden; }
-.hero-visual .screen { width:100%; height:100%; background:linear-gradient(135deg,#0f172a 0%,#1a2332 50%,#0f172a 100%); position:relative; }
-.hero-visual .screen::after { content:""; position:absolute; top:20%; left:10%; width:80%; height:6px; background:rgba(255,255,255,.06); border-radius:3px; }
-.hero-visual .screen::before { content:""; position:absolute; top:35%; left:10%; width:60%; height:6px; background:rgba(255,255,255,.04); border-radius:3px; }
-.hero-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
-.play-btn { width:64px; height:64px; background:rgba(14,165,233,.9); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff; cursor:pointer; animation:pulse 2.5s infinite; transition:.2s; }
-.play-btn:hover { transform:scale(1.1); }
-.landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:60px auto 0; }
-.feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; }
+
+.social-proof { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:28px; flex-wrap:wrap; color:var(--text-dim); font-size:13px; }
+.social-proof .stars { color:#fbbf24; letter-spacing:2px; }
+.social-proof .stars span { color:var(--text-dim); margin-left:6px; letter-spacing:0; font-weight:600; }
+.social-proof .sep { width:4px; height:4px; background:var(--text-faint); border-radius:50%; }
+.social-proof .stat { font-weight:600; color:var(--text); }
+.social-proof .trust { font-weight:500; }
+
+.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:var(--surface); border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.08); position:relative; overflow:hidden; }
+.mock-chrome { height:32px; background:#1e293b; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.06); }
+.mock-dots { display:flex; gap:6px; }
+.mock-dots span { width:10px; height:10px; border-radius:50%; background:#475569; display:block; }
+.mock-url { flex:1; background:#0f172a; border-radius:4px; height:20px; font-size:11px; color:#64748b; display:flex; align-items:center; padding:0 10px; max-width:240px; }
+.mock-body { padding:24px; display:flex; gap:24px; height:calc(100% - 32px); }
+.mock-left { flex:1; display:flex; flex-direction:column; gap:12px; padding-top:16px; }
+.mock-logo { width:70px; height:14px; background:rgba(255,255,255,.08); border-radius:4px; }
+.mock-headline { width:70%; height:22px; background:rgba(255,255,255,.12); border-radius:4px; margin-top:8px; }
+.mock-sub { width:60%; height:14px; background:rgba(255,255,255,.06); border-radius:4px; }
+.mock-btn { width:120px; height:36px; background:var(--accent); border-radius:8px; margin-top:12px; opacity:.8; }
+.mock-right { width:180px; }
+.mock-card { background:#1e293b; border-radius:10px; padding:16px; }
+.mock-stars { color:#f59e0b; font-size:14px; letter-spacing:2px; }
+.mock-review { color:var(--text-dim); font-size:12px; margin-top:8px; }
+.mock-hotspot { position:absolute; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 12px var(--accent); animation:pulse 2s infinite; transform:translate(-50%,-50%); cursor:pointer; }
+.mock-hotspot:hover { transform:translate(-50%,-50%) scale(1.1); }
+.mock-bubble { position:absolute; left: calc(78% + 18px); top: 6%; background:var(--surface-2); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:14px 16px; width:200px; box-shadow:var(--shadow); z-index:5; }
+.mock-bubble::before { content:""; position:absolute; left:-6px; top:18px; width:12px; height:12px; background:var(--surface-2); border-left:1px solid rgba(255,255,255,.12); border-bottom:1px solid rgba(255,255,255,.12); transform:rotate(45deg); }
+.mock-bubble h5 { font-size:12px; color:var(--accent-2); margin-bottom:4px; font-weight:700; }
+.mock-bubble p { font-size:12px; color:var(--text-dim); line-height:1.4; }
+
+.section-title { font-size: clamp(22px, 3vw, 30px); font-weight:700; text-align:center; margin: 100px 0 28px; color:var(--text); }
+.landing-features { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; max-width:900px; width:100%; margin:0 auto; padding:0 12px 80px; }
+.feature-card { background:var(--surface); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:left; transition:.15s; }
+.feature-card:hover { border-color:rgba(255,255,255,.12); transform:translateY(-2px); }
 .feature-icon { width:36px; height:36px; background:var(--surface-2); border-radius:8px; display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:16px; }
 .feature-card h3 { font-size:15px; font-weight:700; margin-bottom:6px; }
 .feature-card p { font-size:13px; color:var(--text-dim); line-height:1.45; }
 
-/* ============================================================
-   CAPTURE SCREEN
-   ============================================================ */
+.hiw-panel { max-width: 900px; margin: 40px auto 0; display:none; padding:0 12px; }
+.hiw-panel.show { display:block; animation:fadeIn .4s ease; }
+.hiw-title { text-align:center; font-size:18px; font-weight:700; margin-bottom:24px; color:var(--text); }
+.hiw-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.hiw-card { background:var(--surface-2); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius-lg); padding:22px; text-align:center; }
+.hiw-num { width:36px; height:36px; background:var(--accent); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; margin:0 auto 12px; }
+.hiw-card h4 { font-size:15px; margin-bottom:6px; }
+.hiw-card p { font-size:13px; color:var(--text-dim); line-height:1.45; }
+
+@media (max-width:800px) {
+  .editor-sidebar { width:100%; position:fixed; bottom:0; left:0; height:45vh; border-left:none; border-top:1px solid rgba(255,255,255,.06); z-index:90; }
+  .editor-stage { padding-bottom:45vh; }
+  .player-bubble { max-width:260px; font-size:12px; padding:14px; }
+  .player-stage { max-height:65vh; }
+  .btn-lg { padding:12px 20px; font-size:15px; }
+}
+@media (max-width:700px) {
+  .hiw-steps { grid-template-columns:1fr; }
+  .mock-right { display:none; }
+  .mock-bubble { width:160px; padding:10px 12px; left:auto; right:4%; top:4%; }
+  .mock-bubble::before { left:auto; right:18px; bottom:-6px; top:auto; transform:rotate(225deg); }
+}
+@media (max-width:600px) {
+  .landing-hero { padding:48px 20px 64px; }
+  .landing-hero h1 { font-size:clamp(28px,7vw,40px); line-height:1.1; }
+  .hero-visual { aspect-ratio:4/3; max-height:320px; }
+  .social-proof .sep { display:none; }
+  .social-proof { gap:10px; font-size:12px; }
+  .player-controls .btn { padding:14px 20px; font-size:16px; min-width:90px; }
+  .player-bubble { max-width:220px; }
+}
 .capture-body { display:flex; flex-direction:column; align-items:center; padding:60px 24px; flex:1; }
 .capture-card { background:var(--surface); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-lg); padding:36px; width:100%; max-width:560px; text-align:center; position:relative; }
 .capture-card h2 { font-size:22px; margin-bottom:8px; }
@@ -210,19 +271,82 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
   </div>
 </div>
 
+<!-- LANDING NAV -->
+<div class="landing-nav" id="landing-nav">
+  <div class="brand" onclick="newDemoConfirm()">
+    <div class="brand-icon">DF</div>
+    <span class="brand-title">DemoForge</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" onclick="newDemoConfirm()">New Demo</button>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div class="df-shell active" id="screen-landing">
   <div class="landing-hero">
-    <h1>Show your product in <span>60 seconds</span>.</h1>
+    <h1>Show your product<br class="desktop-break"> in <span class="accent-highlight">60 seconds</span>.</h1>
     <p>Paste any website URL. Add guided hotspots. Share a link. DemoForge builds interactive product walkthroughs that work on every phone -- no coding, no design skills, no $300/month fees.</p>
     <div class="landing-cta">
       <button class="btn btn-primary btn-lg" onclick="router('capture')">Build a Demo For Free</button>
-      <button class="btn btn-ghost btn-lg" onclick="playSample()">See How It Works</button>
+      <button class="btn btn-ghost btn-lg" onclick="toggleHiW()">See How It Works</button>
     </div>
+    <div class="social-proof">
+      <span class="stars">&#9733;&#9733;&#9733;&#9733;<span>&frac12;</span></span>
+      <span class="sep"></span>
+      <span class="trust">No credit card required</span>
+      <span class="sep"></span>
+      <span class="stat">2,400+</span> demos built
+      <span class="sep"></span>
+      <span class="trust">Free forever plan</span>
+    </div>
+
     <div class="hero-visual">
-      <div class="screen"></div>
-      <div class="hero-overlay">
-        <div class="play-btn" onclick="playSample()">&#9654;</div>
+      <div class="mock-chrome">
+        <div class="mock-dots"><span style="background:#ef4444;"></span><span style="background:#f59e0b;"></span><span style="background:#22c55e;"></span></div>
+        <div class="mock-url">mikes-pest-control.com/book-now</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-left">
+          <div class="mock-logo"></div>
+          <div class="mock-headline"></div>
+          <div class="mock-sub"></div>
+          <div class="mock-btn"></div>
+        </div>
+        <div class="mock-right">
+          <div class="mock-card">
+            <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-hotspot" style="left:78%;top:28%;">1</div>
+      <div class="mock-bubble">
+        <h5>Social Proof Sells</h5>
+        <p>Reviews are the first thing your customer trusts. Put them above the fold.</p>
+      </div>
+    </div>
+
+    <div class="section-title">Why teams choose DemoForge</div>
+
+    <div class="hiw-panel" id="hiw-panel">
+      <p class="hiw-title">Build your guided tour in three steps</p>
+      <div class="hiw-steps">
+        <div class="hiw-card">
+          <div class="hiw-num">1</div>
+          <h4>Capture</h4>
+          <p>Paste your website URL or upload a screenshot. We snapshot it automatically.</p>
+        </div>
+        <div class="hiw-card">
+          <div class="hiw-num">2</div>
+          <h4>Annotate</h4>
+          <p>Click anywhere on the screen to drop a hotspot. Add your own words or voice.</p>
+        </div>
+        <div class="hiw-card">
+          <div class="hiw-num">3</div>
+          <h4>Share</h4>
+          <p>Copy one link or embed the iframe. Your prospect opens it on any phone -- no app needed.</p>
+        </div>
       </div>
     </div>
     <div class="landing-features">
@@ -381,7 +505,15 @@ function router(name) {
   document.querySelectorAll('.df-shell').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('screen-'+name);
   if(el)el.classList.add('active');
-  document.getElementById('topbar').style.display=(name==='landing'||name==='capture')?'none':'flex';
+  const topbar=document.getElementById('topbar');
+  const landingNav=document.getElementById('landing-nav');
+  if(name==='landing'){
+    topbar.style.display='none';
+    if(landingNav)landingNav.style.display='flex';
+  }else{
+    topbar.style.display='flex';
+    if(landingNav)landingNav.style.display='none';
+  }
   if(name==='editor') { renderSteps(); updateEditorTitle(); }
   if(name==='landing') resetState();
   if(name==='share') renderShare();
@@ -421,6 +553,13 @@ function newDemoConfirm(){
     if(!confirm('Start a new demo? Your current work will be lost.')) return;
   }
   router('landing');
+}
+function toggleHiW(){
+  const p=document.getElementById('hiw-panel');
+  if(p) p.classList.toggle('show');
+  if(p && p.classList.contains('show')){
+    p.scrollIntoView({behavior:'smooth', block:'start'});
+  }
 }
 
 /* ========= CAPTURE ========= */
