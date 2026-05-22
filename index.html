@@ -80,29 +80,6 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .social-proof .stat { font-weight:600; color:var(--text); }
 .social-proof .trust { font-weight:500; }
 
-.hero-visual { width:100%; max-width:720px; margin:48px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; animation:fadeIn .8s ease both; }
-.mock-chrome { height:32px; background:#111827; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.08); }
-.mock-dots { display:flex; gap:6px; }
-.mock-dots span { width:10px; height:10px; border-radius:50%; background:#475569; display:block; }
-.mock-url { flex:1; background:#0f172a; border-radius:4px; height:20px; font-size:11px; color:#64748b; display:flex; align-items:center; padding:0 10px; max-width:240px; border:1px solid rgba(255,255,255,.06); }
-.mock-body { padding:20px; display:flex; gap:20px; height:calc(100% - 32px); background:#0f172a; overflow:hidden; border-radius:0 0 var(--radius-lg) var(--radius-lg); }
-.mock-left { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:12px; }
-.mock-logo { width:70px; height:14px; background:rgba(255,255,255,.25); border-radius:4px; }
-.mock-headline { width:75%; height:20px; background:rgba(255,255,255,.35); border-radius:4px; margin-top:6px; }
-.mock-sub { width:55%; height:14px; background:rgba(255,255,255,.18); border-radius:4px; }
-.mock-btn { width:120px; height:34px; background:var(--accent); border-radius:8px; margin-top:10px; opacity:.85; }
-.mock-right { width:170px; display:flex; flex-direction:column; }
-.mock-card { background:#1e293b; border-radius:10px; padding:14px 14px 44px 14px; border:1px solid rgba(255,255,255,.08); position:relative; }
-.mock-stars { color:#f59e0b; font-size:13px; letter-spacing:2px; }
-.mock-review { color:#94a3b8; font-size:11px; margin-top:6px; line-height:1.4; }
-.mock-hotspot { position:absolute; left:auto; right:8px; top:auto; bottom:6px; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; cursor:pointer; z-index:10; }
-.mock-hotspot:hover { transform:scale(1.12); }
-.mock-tooltip{position:absolute;right:42px;bottom:4px;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:10px 14px;max-width:220px;box-shadow:var(--shadow);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease;pointer-events:none;z-index:11;}
-.mock-tooltip strong{display:block;font-size:12px;color:var(--accent-2);margin-bottom:4px;}
-.mock-tooltip p{font-size:11px;line-height:1.4;color:var(--text);margin:0;}
-.hero-visual:hover .mock-tooltip,.hero-visual:focus-within .mock-tooltip{opacity:1;transform:translateY(0);}
-.hero-visual:hover .mock-hotspot,.hero-visual:focus-within .mock-hotspot{animation-play-state:paused;transform:scale(1.15);}
-
 /* Inline demo showcase */
 .demo-showcase{max-width:800px;margin:48px auto 0;padding:0 12px;text-align:center;}
 .demo-showcase h2{font-size:26px;font-weight:700;margin-bottom:8px;}
@@ -163,12 +140,10 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 }
 @media (max-width:700px) {
   .hiw-steps { grid-template-columns:1fr; }
-  .mock-right { display:none; }
 }
 @media (max-width:600px) {
   .landing-hero { padding:48px 20px 64px; }
   .landing-hero h1 { font-size:clamp(28px,7vw,40px); line-height:1.1; }
-  .hero-visual { aspect-ratio:4/3; max-height:320px; }
   .social-proof .sep { display:none; }
   .social-proof { gap:10px; font-size:12px; }
   .player-controls .btn { padding:14px 20px; font-size:16px; min-width:90px; }
@@ -341,32 +316,6 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       <span class="stat">2,400+</span> demos built
       <span class="sep"></span>
       <span class="trust">Free forever plan</span>
-    </div>
-
-    <div class="hero-visual" id="hero-visual">
-      <div class="mock-chrome">
-        <div class="mock-dots"><span></span><span></span><span></span></div>
-        <div class="mock-url">mikespestcontrol.com</div>
-      </div>
-      <div class="mock-body">
-        <div class="mock-left">
-          <div class="mock-logo"></div>
-          <div class="mock-headline"></div>
-          <div class="mock-sub"></div>
-          <div class="mock-btn"></div>
-        </div>
-        <div class="mock-right">
-          <div class="mock-card">
-            <div class="mock-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <div class="mock-review">"Came same day. Very professional. No more ants!"</div>
-            <div class="mock-hotspot">1</div>
-            <div class="mock-tooltip" id="mock-tooltip">
-              <strong>Step 1</strong>
-              <p>Reviews sell while you sleep. Keep them above the fold.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="demo-showcase" id="demo-showcase">
