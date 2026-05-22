@@ -80,12 +80,12 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .social-proof .stat { font-weight:600; color:var(--text); }
 .social-proof .trust { font-weight:500; }
 
-.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; overflow:hidden; }
+.hero-visual { width:100%; max-width:720px; margin:64px auto 0; aspect-ratio:16/10; max-height:420px; background:#0b1220; border-radius:var(--radius-lg); border:1px solid rgba(255,255,255,.1); position:relative; }
 .mock-chrome { height:32px; background:#111827; display:flex; align-items:center; gap:10px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.08); }
 .mock-dots { display:flex; gap:6px; }
 .mock-dots span { width:10px; height:10px; border-radius:50%; background:#475569; display:block; }
 .mock-url { flex:1; background:#0f172a; border-radius:4px; height:20px; font-size:11px; color:#64748b; display:flex; align-items:center; padding:0 10px; max-width:240px; border:1px solid rgba(255,255,255,.06); }
-.mock-body { padding:20px; display:flex; gap:20px; height:calc(100% - 32px); background:#0f172a; }
+.mock-body { padding:20px; display:flex; gap:20px; height:calc(100% - 32px); background:#0f172a; overflow:hidden; border-radius:0 0 var(--radius-lg) var(--radius-lg); }
 .mock-left { flex:1; display:flex; flex-direction:column; gap:10px; padding-top:12px; }
 .mock-logo { width:70px; height:14px; background:rgba(255,255,255,.25); border-radius:4px; }
 .mock-headline { width:75%; height:20px; background:rgba(255,255,255,.35); border-radius:4px; margin-top:6px; }
@@ -97,15 +97,6 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
 .mock-review { color:#94a3b8; font-size:11px; margin-top:6px; line-height:1.4; }
 .mock-hotspot { position:absolute; left:auto; right:8px; top:auto; bottom:6px; width:28px; height:28px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; box-shadow:0 0 14px var(--accent); animation:pulse 2s infinite; cursor:pointer; z-index:10; }
 .mock-hotspot:hover { transform:scale(1.12); }
-
-
-/* Hero mini guided tour */
-.hero-spotlight{position:absolute;width:80px;height:80px;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.72);pointer-events:none;transition:all .6s cubic-bezier(.22,1,.36,1);opacity:0;z-index:20;}
-.hero-spotlight.active{opacity:1;}
-.hero-spotlight::after{content:"";position:absolute;inset:-4px;border:2px solid var(--accent);border-radius:50%;animation:pulse 2s infinite;}
-.hero-bubble{position:absolute;background:var(--surface-2);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-lg);padding:12px 14px;max-width:220px;box-shadow:var(--shadow);transition:all .4s ease;opacity:0;transform:translateY(6px);z-index:21;pointer-events:none;font-size:12px;line-height:1.4;color:var(--text);}
-.hero-bubble.active{opacity:1;transform:translateY(0);}
-.hero-bubble strong{color:var(--accent-2);display:block;margin-bottom:4px;font-size:13px;}
 
 /* Inline demo showcase */
 .demo-showcase{max-width:800px;margin:80px auto 0;padding:0 12px;text-align:center;}
@@ -356,10 +347,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
             <div class="mock-review">"Best service I've ever used. Highly recommend!"</div>
             <div class="mock-hotspot" onclick="playHeroTour()">1</div>
           </div>
-        </div>
       </div>
-      <div class="hero-spotlight" id="hero-spotlight"></div>
-      <div class="hero-bubble" id="hero-bubble"><strong>Step 1</strong><span id="hero-bubble-text">Welcome to your guided tour.</span></div>
     </div>
 
     <div class="demo-showcase" id="demo-showcase">
@@ -407,7 +395,7 @@ button,input,textarea,select { font:inherit; color:inherit; border:none; outline
       </div>
     </div>
     <div class="landing-features">
-      <div class="feature-card" onclick="toggleFeature(this);router('capture')">
+      <div class="feature-card" onclick="toggleFeature(this)">
         <div class="feature-icon">&#128247;</div>
         <h3>Capture Anything</h3>
         <p>Paste a website URL or upload a screenshot. DemoForge handles the rest.</p>
@@ -1044,40 +1032,10 @@ function showEmbedCode(){
 let heroTourTimer=null;
 function playHeroTour(){
   if(heroTourTimer){clearTimeout(heroTourTimer);}
-  const spotlight=document.getElementById('hero-spotlight');
-  const bubble=document.getElementById('hero-bubble');
-  const btext=document.getElementById('hero-bubble-text');
-  const visual=document.querySelector('.hero-visual');
-  if(!spotlight||!bubble||!visual)return;
-  const steps=[
-    {sel:'.mock-headline',txt:'<strong>Headline</strong>Your headline tells visitors what you do in under 3 seconds.'},
-    {sel:'.mock-btn',txt:'<strong>Call to Action</strong>One-tap booking. They pick a time, you get a text.'},
-    {sel:'.mock-card',txt:'<strong>Social Proof</strong>Reviews front and center. Trust sells while you sleep.'}
-  ];
-  let i=0;
-  function showStep(){
-    if(i>=steps.length){spotlight.classList.remove('active');bubble.classList.remove('active');return;}
-    const el=visual.querySelector(steps[i].sel);
-    if(!el){i++;showStep();return;}
-    const r=el.getBoundingClientRect();
-    const vr=visual.getBoundingClientRect();
-    const sx=r.left-vr.left+r.width/2-40;
-    const sy=r.top-vr.top+r.height/2-40;
-    spotlight.style.left=sx+'px'; spotlight.style.top=sy+'px';
-    spotlight.classList.add('active');
-    btext.innerHTML=steps[i].txt;
-    // position bubble next to spotlight
-    let bx=sx+90, by=sy-10;
-    if(bx+220>vr.width)bx=sx-230;
-    if(by+80>vr.height)by=vr.height-90;
-    bubble.style.left=bx+'px'; bubble.style.top=by+'px';
-    bubble.classList.add('active');
-    i++;
-    heroTourTimer=setTimeout(showStep,2500);
-  }
-  showStep();
+  startInlineDemo();
+  const showcase=document.getElementById('demo-showcase');
+  if(showcase)showcase.scrollIntoView({behavior:'smooth',block:'start'});
 }
-function stopHeroTour(){if(heroTourTimer)clearTimeout(heroTourTimer);document.getElementById('hero-spotlight').classList.remove('active');document.getElementById('hero-bubble').classList.remove('active');}
 
 /* ========= INLINE DEMO PLAYER ========= */
 let demoState={idx:0,hotspots:[],playing:false,timer:null};
